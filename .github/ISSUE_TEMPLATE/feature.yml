@@ -1,0 +1,32 @@
+name: Feature / Build Step
+description: Track a Lumenote feature or BUILD_STEPS increment
+title: "[Step N]: "
+labels: ["feat"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Reference [BUILD_STEPS.md](../BUILD_STEPS.md) for verify checkpoints and commit message format.
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      description: Checklist for this step
+      placeholder: |
+        - [ ] Task one
+        - [ ] Task two
+    validations:
+      required: true
+  - type: input
+    id: verify
+    attributes:
+      label: Verify checkpoint
+      description: How to confirm this step works
+      placeholder: npm run dev → dashboard loads notes
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Suggested commit message
+      placeholder: "feat: read notes from Supabase with protected route"
