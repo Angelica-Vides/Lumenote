@@ -29,6 +29,17 @@ export function validatePassword(password, { isRegister = false } = {}) {
   return null;
 }
 
+export function mapAuthError(message) {
+  if (!message) return "Something went wrong. Please try again.";
+  const lower = message.toLowerCase();
+  if (lower.includes("invalid login credentials")) return "Incorrect email or password.";
+  if (lower.includes("email not confirmed")) return "Please confirm your email before logging in.";
+  if (lower.includes("user already registered")) {
+    return "An account with this email already exists. Try logging in.";
+  }
+  return message;
+}
+
 export function validateNote({ title, body = "", color = DEFAULT_NOTE_COLOR }) {
   const trimmedTitle = title.trim();
   if (!trimmedTitle) return "Title is required.";

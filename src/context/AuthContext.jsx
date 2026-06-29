@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabase";
-import { validateEmail, validatePassword } from "../lib/validation";
+import { mapAuthError, validateEmail, validatePassword } from "../lib/validation";
 
 const AuthContext = createContext(null);
 
@@ -39,7 +39,7 @@ export function AuthProvider({ children }) {
       password,
     });
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(mapAuthError(error.message));
     return data;
   };
 
@@ -55,13 +55,13 @@ export function AuthProvider({ children }) {
       password,
     });
 
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(mapAuthError(error.message));
     return data;
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(mapAuthError(error.message));
   };
 
   const value = useMemo(

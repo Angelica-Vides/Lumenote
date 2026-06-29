@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { validateEmail, validatePassword } from "../lib/validation";
 
 export default function Login() {
-  const { signIn } = useAuth();
+  const { signIn, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/dashboard";
@@ -15,8 +16,21 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
     setError("");
+
+    const emailError = validateEmail(email);
+    if (emailError) {
+      setError(emailError);
+      return;
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
+    setSubmitting(true);
     try {
       await signIn(email, password);
       navigate(from, { replace: true });
@@ -27,13 +41,21 @@ export default function Login() {
     }
   };
 
+  if (authLoading) {
+    return (
+      <div className="page-center">
+        <p className="muted">Loading…</p>
+      </div>
+    );
+  }
+
   return (
     <section className="auth container">
       <div className="auth__card card">
         <h1>Log in</h1>
         <p className="muted">Welcome back. Enter your credentials to continue.</p>
 
-        <form className="auth__form" onSubmit={handleSubmit}>
+        <form className="auth__form" onSubmit={handleSubmit} noValidate>
           {error && (
             <p className="form-error" role="alert">
               {error}
@@ -47,7 +69,10 @@ export default function Login() {
               autoComplete="email"
               placeholder="you@school.edu"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError("");
+              }}
               required
             />
           </label>
@@ -57,7 +82,10 @@ export default function Login() {
               type="password"
               autoComplete="current-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError("");
+              }}
               required
             />
           </label>

@@ -1,14 +1,16 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Layout({ children }) {
   const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
       await signOut();
+      navigate("/", { replace: true });
     } catch {
-      // Session cleared locally even if network fails
+      navigate("/", { replace: true });
     }
   };
 
