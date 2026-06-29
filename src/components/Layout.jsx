@@ -1,6 +1,17 @@
 import { Link, NavLink } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Layout({ children }) {
+  const { user, loading, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch {
+      // Session cleared locally even if network fails
+    }
+  };
+
   return (
     <div className="app">
       <header className="header">
@@ -9,15 +20,27 @@ export default function Layout({ children }) {
             <span className="logo__mark">✦</span> Lumenote
           </Link>
           <nav className="nav">
-            <NavLink to="/dashboard" className="nav__link">
-              My Notes
-            </NavLink>
-            <NavLink to="/login" className="nav__link">
-              Log in
-            </NavLink>
-            <Link to="/register" className="btn btn--primary btn--sm">
-              Sign up
-            </Link>
+            {user && (
+              <>
+                <NavLink to="/dashboard" className="nav__link">
+                  My Notes
+                </NavLink>
+                <span className="nav__email">{user.email}</span>
+                <button type="button" className="btn btn--ghost btn--sm" onClick={handleSignOut}>
+                  Sign out
+                </button>
+              </>
+            )}
+            {!loading && !user && (
+              <>
+                <NavLink to="/login" className="nav__link">
+                  Log in
+                </NavLink>
+                <Link to="/register" className="btn btn--primary btn--sm">
+                  Sign up
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>

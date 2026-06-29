@@ -16,8 +16,7 @@ export default function EmptyState() {
         </svg>
       </div>
       <h3>No notes yet</h3>
-      <p>Create your first note using the form above. Your ideas deserve a place to live.</p>
-      <p className="empty-state__hint">↑ Start with a title and hit Save note</p>
+      <p>Your notes will appear here once you create them.</p>
     </div>
   );
 }

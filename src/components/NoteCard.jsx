@@ -20,17 +20,25 @@ export default function NoteCard({ note, onEdit, onDelete, onTogglePin }) {
       <p className="note-card__meta">
         Updated {formatDate(note.updated_at)} · {note.color}
       </p>
-      <div className="note-card__actions">
-        <button type="button" className="btn btn--ghost btn--sm" onClick={() => onTogglePin(note)}>
-          {note.pinned ? "Unpin" : "Pin"}
-        </button>
-        <button type="button" className="btn btn--ghost btn--sm" onClick={() => onEdit(note)}>
-          Edit
-        </button>
-        <button type="button" className="btn btn--danger btn--sm" onClick={() => onDelete(note.id)}>
-          Delete
-        </button>
-      </div>
+      {(onEdit || onDelete || onTogglePin) && (
+        <div className="note-card__actions">
+          {onTogglePin && (
+            <button type="button" className="btn btn--ghost btn--sm" onClick={() => onTogglePin(note)}>
+              {note.pinned ? "Unpin" : "Pin"}
+            </button>
+          )}
+          {onEdit && (
+            <button type="button" className="btn btn--ghost btn--sm" onClick={() => onEdit(note)}>
+              Edit
+            </button>
+          )}
+          {onDelete && (
+            <button type="button" className="btn btn--danger btn--sm" onClick={() => onDelete(note.id)}>
+              Delete
+            </button>
+          )}
+        </div>
+      )}
     </article>
   );
 }
