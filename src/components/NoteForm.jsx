@@ -23,7 +23,7 @@ export default function NoteForm({
     setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationError = validateNote(form);
     if (validationError) {
@@ -33,8 +33,10 @@ export default function NoteForm({
     setSubmitting(true);
     setError("");
     try {
-      onSubmit(form);
+      await onSubmit(form);
       if (!onCancel) setForm({ title: "", body: "", color: DEFAULT_NOTE_COLOR });
+    } catch (err) {
+      setError(err.message || "Could not save note.");
     } finally {
       setSubmitting(false);
     }

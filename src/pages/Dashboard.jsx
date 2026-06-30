@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { fetchNotes } from "../lib/notes";
+import { useAuth } from "../context/AuthContext";
+import NoteForm from "../components/NoteForm";
 import NoteList from "../components/NoteList";
+import { createNote, deleteNote, fetchNotes } from "../lib/notes";
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -25,14 +28,34 @@ export default function Dashboard() {
     loadNotes();
   }, [loadNotes]);
 
+  const handleCreate = async (form) => {
+    const created = await createNote(user.id, form);
+    setNotes((prev) => [created, ...prev]);
+    setError("");
+  };
+
+  const handleDelete = async (noteId) => {
+    if (!window.confirm("Delete this note permanently?")) return;
+
+    try {
+      await deleteNote(noteId);
+      setNotes((prev) => prev.filter((n) => n.id !== noteId));
+      setError("");
+    } catch (err) {
+      setError(err.message || "Could not delete note.");
+    }
+  };
+
   return (
     <section className="dashboard container">
       <header className="dashboard__header">
         <div>
           <h1>My Notes</h1>
-          <p className="muted">Your personal notes from Supabase</p>
+          <p className="muted">Create and manage your personal notes</p>
         </div>
       </header>
+
+      <NoteForm onSubmit={handleCreate} />
 
       {loading && (
         <p className="dashboard__status muted" role="status">
@@ -46,7 +69,7 @@ export default function Dashboard() {
         </p>
       )}
 
-      {!loading && !error && <NoteList notes={notes} />}
+      {!loading && !error && <NoteList notes={notes} onDelete={handleDelete} />}
     </section>
   );
 }
