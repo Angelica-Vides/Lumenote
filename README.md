@@ -4,7 +4,9 @@ A personal notes app for students and thinkers. Capture study notes, ideas, and 
 
 Built for the **Week 2 Full-Stack Assignment**: database integration, authentication, CRUD, CI/CD, and documentation.
 
-> **Live URL:** *After Netlify deploy:* [https://lumenote-angelica-vides.netlify.app/](https://lumenote-angelica-vides.netlify.app/) *(replace with your URL)*
+> **Live URL:** *After Netlify deploy:*
+>
+>  [https://lumenote-angelica-vides.netlify.app](https://lumenote-angelica-vides.netlify.app/)
 
 > **Note:** This is the **Lumenote** app (Week 2). It is separate from the Week 1 portfolio project. Local folder: `lumenote/`.
 
@@ -234,8 +236,6 @@ npm run deploy:pages
 Instructor sets **Pages → Deploy from branch → `gh-pages` / root**
 
 Live URL: `https://fau-ai-hootcamp-summer-2026.github.io/week2-Angelica-Vides/`
-
-
 
 ---
 
