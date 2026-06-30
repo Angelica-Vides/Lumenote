@@ -2,13 +2,21 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import NoteForm from "../components/NoteForm";
 import NoteList from "../components/NoteList";
-import { createNote, deleteNote, fetchNotes } from "../lib/notes";
+import { createNote, deleteNote, fetchNotes, updateNote } from "../lib/notes";
+
+function sortNotes(notes) {
+  return [...notes].sort((a, b) => {
+    if (a.pinned !== b.pinned) return Number(b.pinned) - Number(a.pinned);
+    return new Date(b.updated_at) - new Date(a.updated_at);
+  });
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [editingNote, setEditingNote] = useState(null);
 
   const loadNotes = useCallback(async () => {
     setLoading(true);
@@ -30,8 +38,29 @@ export default function Dashboard() {
 
   const handleCreate = async (form) => {
     const created = await createNote(user.id, form);
-    setNotes((prev) => [created, ...prev]);
+    setNotes((prev) => sortNotes([created, ...prev]));
     setError("");
+  };
+
+  const handleUpdate = async (form) => {
+    const updated = await updateNote(editingNote.id, {
+      title: form.title,
+      body: form.body,
+      color: form.color,
+    });
+    setNotes((prev) => sortNotes(prev.map((n) => (n.id === updated.id ? updated : n))));
+    setEditingNote(null);
+    setError("");
+  };
+
+  const handleTogglePin = async (note) => {
+    try {
+      const updated = await updateNote(note.id, { pinned: !note.pinned });
+      setNotes((prev) => sortNotes(prev.map((n) => (n.id === updated.id ? updated : n))));
+      setError("");
+    } catch (err) {
+      setError(err.message || "Could not update note.");
+    }
   };
 
   const handleDelete = async (noteId) => {
@@ -40,6 +69,7 @@ export default function Dashboard() {
     try {
       await deleteNote(noteId);
       setNotes((prev) => prev.filter((n) => n.id !== noteId));
+      if (editingNote?.id === noteId) setEditingNote(null);
       setError("");
     } catch (err) {
       setError(err.message || "Could not delete note.");
@@ -51,11 +81,25 @@ export default function Dashboard() {
       <header className="dashboard__header">
         <div>
           <h1>My Notes</h1>
-          <p className="muted">Create and manage your personal notes</p>
+          <p className="muted">Create, edit, and pin your personal notes</p>
         </div>
       </header>
 
-      <NoteForm onSubmit={handleCreate} />
+      {editingNote ? (
+        <NoteForm
+          key={editingNote.id}
+          initial={{
+            title: editingNote.title,
+            body: editingNote.body,
+            color: editingNote.color,
+          }}
+          submitLabel="Save changes"
+          onSubmit={handleUpdate}
+          onCancel={() => setEditingNote(null)}
+        />
+      ) : (
+        <NoteForm onSubmit={handleCreate} />
+      )}
 
       {loading && (
         <p className="dashboard__status muted" role="status">
@@ -69,7 +113,14 @@ export default function Dashboard() {
         </p>
       )}
 
-      {!loading && !error && <NoteList notes={notes} onDelete={handleDelete} />}
+      {!loading && !error && (
+        <NoteList
+          notes={notes}
+          onEdit={setEditingNote}
+          onDelete={handleDelete}
+          onTogglePin={handleTogglePin}
+        />
+      )}
     </section>
   );
 }
