@@ -4,7 +4,9 @@ A personal notes app for students and thinkers. Capture study notes, ideas, and 
 
 Built for the **Week 2 Full-Stack Assignment**: database integration, authentication, CRUD, CI/CD, and documentation.
 
-> **Live URL:** _After deploy:_ `https://<username>.github.io/lumenote/`
+> **Live URL:** *After deploy:*
+>
+>  [https://fau-ai-hootcamp-summer-2026.github.io/week2-Angelica-Vides/](https://fau-ai-hootcamp-summer-2026.github.io/week2-Angelica-Vides/)
 
 > **Note:** This is the **Lumenote** app (Week 2). It is separate from the Week 1 portfolio project. Local folder: `lumenote/`.
 
@@ -33,17 +35,19 @@ Built for the **Week 2 Full-Stack Assignment**: database integration, authentica
 
 ## Documentation Index
 
-| Document | Description |
-|----------|-------------|
-| [PLAN.md](./PLAN.md) | Concept, scope, open decisions |
-| [DESIGN.md](./DESIGN.md) | Design system, wireframes, iteration checklist |
-| [DESIGN_LOG.md](./DESIGN_LOG.md) | Changelog of design iterations |
-| [mockup.html](./mockup.html) | Interactive static mockup — iterate design here |
-| [BUILD_STEPS.md](./BUILD_STEPS.md) | Incremental build steps with Verify checkpoints |
-| [DIAGRAMS.md](./DIAGRAMS.md) | Mermaid ERD, flows, sequences, component hierarchy |
-| [docs/DATABASE.md](./docs/DATABASE.md) | Schema, RLS, design decisions |
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | How frontend, BaaS, and DB fit together |
-| [ISSUES.md](./ISSUES.md) | GitHub issues and project board guide |
+
+| Document                                       | Description                                        |
+| ---------------------------------------------- | -------------------------------------------------- |
+| [PLAN.md](./PLAN.md)                           | Concept, scope, open decisions                     |
+| [DESIGN.md](./DESIGN.md)                       | Design system, wireframes, iteration checklist     |
+| [DESIGN_LOG.md](./DESIGN_LOG.md)               | Changelog of design iterations                     |
+| [mockup.html](./mockup.html)                   | Interactive static mockup — iterate design here    |
+| [BUILD_STEPS.md](./BUILD_STEPS.md)             | Incremental build steps with Verify checkpoints    |
+| [DIAGRAMS.md](./DIAGRAMS.md)                   | Mermaid ERD, flows, sequences, component hierarchy |
+| [docs/DATABASE.md](./docs/DATABASE.md)         | Schema, RLS, design decisions                      |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | How frontend, BaaS, and DB fit together            |
+| [ISSUES.md](./ISSUES.md)                       | GitHub issues and project board guide              |
+
 
 ## Project Status
 
@@ -95,7 +99,7 @@ npm install
 ### 3. Configure Supabase
 
 1. Create a project at [supabase.com/dashboard](https://supabase.com/dashboard)
-2. Open **SQL Editor** → run [`supabase/schema.sql`](./supabase/schema.sql)
+2. Open **SQL Editor** → run `[supabase/schema.sql](./supabase/schema.sql)`
 3. **Authentication → Providers → Email** → disable **Confirm email** (recommended for local dev)
 4. Copy **Project URL** and **anon public key** from **Settings → API**
 
@@ -166,17 +170,22 @@ Click **Sign out** in the nav — session clears; dashboard is no longer accessi
 
 ### GitHub Actions (CI/CD)
 
-Push to `main` triggers [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml):
+Push to `main` triggers `[.github/workflows/deploy.yml](./.github/workflows/deploy.yml)`:
 
-1. Install dependencies (`npm ci`)
-2. Build with Supabase env vars from secrets
-3. Deploy `dist/` to GitHub Pages
+1. Verify Supabase secrets are set (on push to `main`)
+2. Install dependencies (`npm ci`)
+3. Build with Supabase env vars from secrets and `VITE_BASE_PATH=/week2-Angelica-Vides/`
+4. Deploy `dist/` to GitHub Pages
 
-### One-time GitHub setup
+You can also run deploy manually: **Actions → CI/CD Deploy → Run workflow**.
+
+### One-time GitHub setup (repo admin required)
+
+If you see *"You don't have access to repository options"* in Settings, ask your instructor to complete these steps:
 
 1. **Settings → Secrets and variables → Actions** — add:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
+  - `VITE_SUPABASE_URL` — same as your local `.env`
+  - `VITE_SUPABASE_ANON_KEY` — same as your local `.env`
 2. **Settings → Pages → Build and deployment → Source: GitHub Actions**
 
 ### Live URL
@@ -184,10 +193,22 @@ Push to `main` triggers [`.github/workflows/deploy.yml`](./.github/workflows/dep
 After a successful deploy:
 
 ```
-https://<github-username>.github.io/lumenote/
+https://fau-ai-hootcamp-summer-2026.github.io/week2-Angelica-Vides/
 ```
 
-Smoke-test: register → create note → edit → delete on the live URL.
+Smoke-test on the live URL: register → create note → edit → pin → delete.
+
+### Troubleshooting failed deploy emails
+
+
+| Failed step                 | Likely cause                                   |
+| --------------------------- | ---------------------------------------------- |
+| **Verify Supabase secrets** | Secrets not added (needs admin)                |
+| **Deploy**                  | GitHub Pages not set to **GitHub Actions**     |
+| **Build**                   | Code error — run `npm run build` locally first |
+
+
+Open **Actions** on GitHub, click the failed run, and expand the red step for the exact message.
 
 ---
 
@@ -244,6 +265,10 @@ docs: complete assignment documentation
 ## License
 
 MIT — educational use.
+
 # week2-Angelica-Vides
+
 # week2-Angelica-Vides
+
 # week2-Angelica-Vides
+

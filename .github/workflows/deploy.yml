@@ -5,6 +5,7 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -27,6 +28,18 @@ jobs:
         with:
           node-version: "20"
           cache: npm
+
+      - name: Verify Supabase secrets
+        if: github.event_name == 'push'
+        run: |
+          if [ -z "${{ secrets.VITE_SUPABASE_URL }}" ]; then
+            echo "::error::Missing repository secret VITE_SUPABASE_URL. Add it under Settings → Secrets and variables → Actions (requires repo admin)."
+            exit 1
+          fi
+          if [ -z "${{ secrets.VITE_SUPABASE_ANON_KEY }}" ]; then
+            echo "::error::Missing repository secret VITE_SUPABASE_ANON_KEY. Add it under Settings → Secrets and variables → Actions (requires repo admin)."
+            exit 1
+          fi
 
       - name: Install dependencies
         run: npm ci
