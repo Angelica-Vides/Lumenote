@@ -8,6 +8,9 @@ Built for the **Week 2 Full-Stack Assignment**: database integration, authentica
 >
 >  [https://lumenote-angelica-vides.netlify.app](https://lumenote-angelica-vides.netlify.app/)
 
+> **Demo Video URL:**  
+> [https://youtu.be/LH4xtiiTwuk](https://youtu.be/LH4xtiiTwuk)
+>
 > **Note:** This is the **Lumenote** app (Week 2). It is separate from the Week 1 portfolio project. Local folder: `lumenote/`.
 
 ---
