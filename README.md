@@ -4,9 +4,7 @@ A personal notes app for students and thinkers. Capture study notes, ideas, and 
 
 Built for the **Week 2 Full-Stack Assignment**: database integration, authentication, CRUD, CI/CD, and documentation.
 
-> **Live URL:** *After deploy:*
->
->  [https://fau-ai-hootcamp-summer-2026.github.io/week2-Angelica-Vides/](https://fau-ai-hootcamp-summer-2026.github.io/week2-Angelica-Vides/)
+> **Live URL:** *After Netlify deploy:* [https://lumenote-angelica-vides.netlify.app/](https://lumenote-angelica-vides.netlify.app/) *(replace with your URL)*
 
 > **Note:** This is the **Lumenote** app (Week 2). It is separate from the Week 1 portfolio project. Local folder: `lumenote/`.
 
@@ -18,7 +16,7 @@ Built for the **Week 2 Full-Stack Assignment**: database integration, authentica
 
 **Solution:** Lumenote provides email/password auth, a protected dashboard, and full CRUD on personal notes with pin and color organization.
 
-**Stack:** React + Vite frontend · Supabase (PostgreSQL + Auth + RLS) · GitHub Actions → GitHub Pages
+**Stack:** React + Vite frontend · Supabase (PostgreSQL + Auth + RLS) · Netlify (manual CLI deploy) · GitHub Actions workflow in repo
 
 ---
 
@@ -168,47 +166,104 @@ Click **Sign out** in the nav — session clears; dashboard is no longer accessi
 
 ## Deployment
 
-### GitHub Actions (CI/CD)
+**Recommended: Netlify manual CLI** (meets “deploy to cloud” requirement without auto-deploy on every push).
 
-Push to `main` triggers `[.github/workflows/deploy.yml](./.github/workflows/deploy.yml)`:
+### Netlify — manual CLI deploy (recommended)
 
-1. Verify Supabase secrets are set (on push to `main`)
-2. Install dependencies (`npm ci`)
-3. Build with Supabase env vars from secrets and `VITE_BASE_PATH=/week2-Angelica-Vides/`
-4. Deploy `dist/` to GitHub Pages
+Uses your local `.env` at build time. **Do not** connect GitHub auto-deploy in Netlify — that uses credits on every push. Deploy only when you choose.
 
-You can also run deploy manually: **Actions → CI/CD Deploy → Run workflow**.
+#### One-time setup
 
-### One-time GitHub setup (repo admin required)
+1. Create a free account at [netlify.com](https://www.netlify.com/)
+2. Install the CLI and log in:
+  ```bash
+   npm install -g netlify-cli
+   netlify login
+  ```
+3. Link this project to a new Netlify site (say **No** to continuous deployment / GitHub auto-build):
+  ```bash
+   cd /path/to/lumenote
+   netlify init
+  ```
+   Choose **Create & configure a new project** and pick a site name (e.g. `lumenote-angelica-vides`).
+4. **Supabase Auth URLs** — in [Supabase Dashboard](https://supabase.com/dashboard) → **Authentication → URL Configuration**:
+  - **Site URL:** `https://YOUR-SITE-NAME.netlify.app`
+  - **Redirect URLs:** add `https://YOUR-SITE-NAME.netlify.app/`**
 
-If you see *"You don't have access to repository options"* in Settings, ask your instructor to complete these steps:
+#### Deploy (whenever you want an updated live site)
 
-1. **Settings → Secrets and variables → Actions** — add:
-  - `VITE_SUPABASE_URL` — same as your local `.env`
-  - `VITE_SUPABASE_ANON_KEY` — same as your local `.env`
-2. **Settings → Pages → Build and deployment → Source: GitHub Actions**
-
-### Live URL
-
-After a successful deploy:
-
+```bash
+nvm use 20
+npm run deploy:netlify
 ```
-https://fau-ai-hootcamp-summer-2026.github.io/week2-Angelica-Vides/
+
+The CLI prints your live URL, e.g. `https://lumenote-angelica-vides.netlify.app`
+
+Put that URL at the top of this README and use it in your demo video.
+
+#### Why manual?
+
+
+| Approach                                            | Credits / cost                                 |
+| --------------------------------------------------- | ---------------------------------------------- |
+| **Manual CLI** (`npm run deploy:netlify`)           | You deploy only when you run the command       |
+| **Netlify + GitHub auto-deploy**                    | Builds on every push — uses free tier fast     |
+| **GitHub Actions** (`.github/workflows/deploy.yml`) | Free for public repos; optional if Pages works |
+
+
+Your repo still includes the GitHub Actions workflow for CI/CD credit — it shows you configured automated deploy even if the Classroom org blocks GitHub Pages.
+
+---
+
+### GitHub Pages (alternatives)
+
+Option A — GitHub Actions · Option B — gh-pages branch
+
+**Option A — GitHub Actions**
+
+1. **Settings → Pages → Source → GitHub Actions**
+2. Add secrets `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+3. Push to `main`
+
+**Option B — Deploy from a branch**
+
+```bash
+npm run deploy:pages
 ```
 
-Smoke-test on the live URL: register → create note → edit → pin → delete.
+Instructor sets **Pages → Deploy from branch → `gh-pages` / root**
 
-### Troubleshooting failed deploy emails
-
-
-| Failed step                 | Likely cause                                   |
-| --------------------------- | ---------------------------------------------- |
-| **Verify Supabase secrets** | Secrets not added (needs admin)                |
-| **Deploy**                  | GitHub Pages not set to **GitHub Actions**     |
-| **Build**                   | Code error — run `npm run build` locally first |
+Live URL: `https://fau-ai-hootcamp-summer-2026.github.io/week2-Angelica-Vides/`
 
 
-Open **Actions** on GitHub, click the failed run, and expand the red step for the exact message.
+
+---
+
+### Demo video (2–3 min)
+
+Record on your **Netlify live URL** (best) or `http://localhost:5173`.
+
+**Show in order:**
+
+1. Landing page
+2. Sign up → dashboard
+3. Create a note (title, body, color)
+4. Edit the note
+5. Pin the note
+6. Delete the note
+7. Sign out → `/dashboard` redirects to login
+8. Briefly show the live URL in the browser address bar
+
+### Troubleshooting
+
+
+| Problem                                  | Fix                                                              |
+| ---------------------------------------- | ---------------------------------------------------------------- |
+| Blank page after refresh on `/dashboard` | `netlify.toml` + `public/_redirects` SPA rules (already in repo) |
+| Auth fails on live site                  | Add Netlify URL to Supabase **Redirect URLs**                    |
+| `netlify: command not found`             | `npm install -g netlify-cli` or use `npx netlify-cli`            |
+| Build fails                              | `nvm use 20` then ensure `.env` has Supabase keys                |
+
 
 ---
 
