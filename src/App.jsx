@@ -14,9 +14,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Layout>
-          <div className="container supabase-status-wrap">
-            <SupabaseStatus />
-          </div>
+          <SupabaseStatus />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />

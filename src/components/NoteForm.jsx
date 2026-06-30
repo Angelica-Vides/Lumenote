@@ -43,7 +43,7 @@ export default function NoteForm({
   };
 
   return (
-    <form className="note-form card" onSubmit={handleSubmit}>
+    <form className="note-form card" onSubmit={handleSubmit} noValidate>
       <h3 className="note-form__title">{onCancel ? "Edit note" : "New note"}</h3>
       {error && (
         <p className="form-error" role="alert">
@@ -59,7 +59,6 @@ export default function NoteForm({
           onChange={handleChange}
           placeholder="Note title"
           maxLength={120}
-          required
         />
       </label>
 

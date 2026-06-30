@@ -19,34 +19,32 @@ export default function SupabaseStatus() {
     };
   }, []);
 
-  if (status.loading) {
-    return (
-      <div className="supabase-status supabase-status--loading card" role="status">
-        Checking Supabase connection…
-      </div>
-    );
-  }
+  if (status.loading) return null;
+
+  if (status.ok && isSupabaseConfigured()) return null;
 
   const className = status.ok
     ? "supabase-status supabase-status--ok card"
     : "supabase-status supabase-status--warn card";
 
   return (
-    <div className={className} role="status">
-      <strong>{status.ok ? "Supabase connected" : "Supabase not ready"}</strong>
-      <p>{status.message}</p>
-      {!isSupabaseConfigured() && (
-        <p className="supabase-status__steps">
-          1. Create a project at{" "}
-          <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">
-            supabase.com/dashboard
-          </a>
-          <br />
-          2. Copy <code>.env.example</code> → <code>.env</code>
-          <br />
-          3. Paste <strong>Project URL</strong> and <strong>anon public key</strong> from Settings → API
-        </p>
-      )}
+    <div className="container supabase-status-wrap">
+      <div className={className} role="status">
+        <strong>{status.ok ? "Supabase connected" : "Supabase not configured"}</strong>
+        <p>{status.message}</p>
+        {!isSupabaseConfigured() && (
+          <p className="supabase-status__steps">
+            1. Create a project at{" "}
+            <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">
+              supabase.com/dashboard
+            </a>
+            <br />
+            2. Copy <code>.env.example</code> → <code>.env</code>
+            <br />
+            3. Paste <strong>Project URL</strong> and <strong>anon public key</strong> from Settings → API
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editingNote, setEditingNote] = useState(null);
+  const [pendingNoteId, setPendingNoteId] = useState(null);
 
   const loadNotes = useCallback(async () => {
     setLoading(true);
@@ -54,18 +55,22 @@ export default function Dashboard() {
   };
 
   const handleTogglePin = async (note) => {
+    setPendingNoteId(note.id);
     try {
       const updated = await updateNote(note.id, { pinned: !note.pinned });
       setNotes((prev) => sortNotes(prev.map((n) => (n.id === updated.id ? updated : n))));
       setError("");
     } catch (err) {
       setError(err.message || "Could not update note.");
+    } finally {
+      setPendingNoteId(null);
     }
   };
 
   const handleDelete = async (noteId) => {
     if (!window.confirm("Delete this note permanently?")) return;
 
+    setPendingNoteId(noteId);
     try {
       await deleteNote(noteId);
       setNotes((prev) => prev.filter((n) => n.id !== noteId));
@@ -73,6 +78,8 @@ export default function Dashboard() {
       setError("");
     } catch (err) {
       setError(err.message || "Could not delete note.");
+    } finally {
+      setPendingNoteId(null);
     }
   };
 
@@ -101,24 +108,29 @@ export default function Dashboard() {
         <NoteForm onSubmit={handleCreate} />
       )}
 
-      {loading && (
-        <p className="dashboard__status muted" role="status">
-          Loading notes…
-        </p>
-      )}
-
       {error && (
-        <p className="form-error dashboard__error" role="alert">
-          {error}
-        </p>
+        <div className="dashboard__error">
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+          <button type="button" className="btn btn--ghost btn--sm" onClick={loadNotes}>
+            Try again
+          </button>
+        </div>
       )}
 
-      {!loading && !error && (
+      {loading ? (
+        <div className="loading-panel" role="status" aria-live="polite">
+          <span className="spinner" aria-hidden="true" />
+          Loading notes…
+        </div>
+      ) : (
         <NoteList
           notes={notes}
           onEdit={setEditingNote}
           onDelete={handleDelete}
           onTogglePin={handleTogglePin}
+          pendingNoteId={pendingNoteId}
         />
       )}
     </section>

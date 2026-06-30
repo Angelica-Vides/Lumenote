@@ -1,10 +1,36 @@
 import { supabase } from "./supabase";
 import { validateNote, DEFAULT_NOTE_COLOR } from "./validation";
 
-function mapDbError(error) {
+export function mapDbError(error) {
   if (!error) return "Something went wrong. Please try again.";
-  if (error.code === "23514") return "Note data failed validation.";
-  if (error.code === "42501") return "You do not have permission to perform this action.";
+
+  const message = error.message?.toLowerCase() || "";
+
+  switch (error.code) {
+    case "23514":
+      return "Note data failed validation.";
+    case "42501":
+      return "You don't have permission to perform this action.";
+    case "PGRST116":
+      return "That note could not be found. It may have been deleted.";
+    case "42P01":
+      return "Notes table missing. Run supabase/schema.sql in your Supabase SQL Editor.";
+    case "23503":
+      return "Could not save note. Please sign out and log in again.";
+    default:
+      break;
+  }
+
+  if (message.includes("jwt") || message.includes("session")) {
+    return "Your session expired. Please log in again.";
+  }
+  if (message.includes("failed to fetch") || message.includes("network")) {
+    return "Network error. Check your connection and try again.";
+  }
+  if (message.includes("duplicate")) {
+    return "A note with this data already exists.";
+  }
+
   return error.message || "Something went wrong. Please try again.";
 }
 

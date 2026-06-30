@@ -6,7 +6,7 @@ function formatDate(iso) {
   });
 }
 
-export default function NoteCard({ note, onEdit, onDelete, onTogglePin }) {
+export default function NoteCard({ note, onEdit, onDelete, onTogglePin, disabled = false }) {
   const preview = note.body
     ? note.body.length > 140
       ? `${note.body.slice(0, 140)}…`
@@ -23,18 +23,33 @@ export default function NoteCard({ note, onEdit, onDelete, onTogglePin }) {
       {(onEdit || onDelete || onTogglePin) && (
         <div className="note-card__actions">
           {onTogglePin && (
-            <button type="button" className="btn btn--ghost btn--sm" onClick={() => onTogglePin(note)}>
-              {note.pinned ? "Unpin" : "Pin"}
+            <button
+              type="button"
+              className="btn btn--ghost btn--sm"
+              onClick={() => onTogglePin(note)}
+              disabled={disabled}
+            >
+              {disabled ? "…" : note.pinned ? "Unpin" : "Pin"}
             </button>
           )}
           {onEdit && (
-            <button type="button" className="btn btn--ghost btn--sm" onClick={() => onEdit(note)}>
+            <button
+              type="button"
+              className="btn btn--ghost btn--sm"
+              onClick={() => onEdit(note)}
+              disabled={disabled}
+            >
               Edit
             </button>
           )}
           {onDelete && (
-            <button type="button" className="btn btn--danger btn--sm" onClick={() => onDelete(note.id)}>
-              Delete
+            <button
+              type="button"
+              className="btn btn--danger btn--sm"
+              onClick={() => onDelete(note.id)}
+              disabled={disabled}
+            >
+              {disabled ? "…" : "Delete"}
             </button>
           )}
         </div>

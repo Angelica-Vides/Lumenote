@@ -334,7 +334,41 @@ a:hover {
 }
 
 .dashboard__error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
   margin-bottom: 1rem;
+}
+
+.dashboard__error .form-error {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 200px;
+}
+
+.loading-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2.5rem 1rem;
+  color: var(--muted);
+}
+
+.spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .nav__email {
@@ -347,8 +381,49 @@ a:hover {
 }
 
 @media (max-width: 600px) {
+  .header__inner {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .nav {
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
   .nav__email {
     display: none;
+  }
+
+  .hero__title {
+    font-size: 1.75rem;
+  }
+
+  .dashboard__header {
+    flex-direction: column;
+  }
+
+  .note-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .note-form__actions {
+    flex-direction: column;
+  }
+
+  .note-form__actions .btn {
+    width: 100%;
+  }
+
+  .note-card__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .auth__card {
+    padding: 1.25rem;
   }
 }
 
@@ -557,15 +632,4 @@ a:hover {
   text-align: center;
   color: var(--muted);
   font-size: 0.85rem;
-}
-
-@media (max-width: 600px) {
-  .nav {
-    gap: 0.5rem;
-  }
-
-  .note-card__actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
 }
