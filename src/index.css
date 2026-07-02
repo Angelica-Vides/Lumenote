@@ -356,6 +356,11 @@ a:hover {
   color: var(--muted);
 }
 
+.loading-panel--compact {
+  justify-content: flex-start;
+  padding: 0.25rem 0;
+}
+
 .spinner {
   width: 1.25rem;
   height: 1.25rem;
@@ -443,6 +448,78 @@ a:hover {
 .note-form__actions {
   display: flex;
   gap: 0.75rem;
+}
+
+.ai-assistant {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-color: rgba(45, 212, 191, 0.35);
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.08), var(--surface) 40%);
+}
+
+.ai-assistant h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.35rem;
+}
+
+.ai-assistant__eyebrow {
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+}
+
+.ai-assistant__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.ai-assistant__hint,
+.ai-result__meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.ai-result {
+  display: grid;
+  gap: 0.75rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.ai-result h4 {
+  font-size: 0.9rem;
+  color: var(--primary);
+}
+
+.ai-result__list {
+  display: grid;
+  gap: 0.65rem;
+  padding-left: 1.25rem;
+}
+
+.ai-result__list li {
+  color: var(--muted);
+}
+
+.ai-result__list strong,
+.ai-result__list span,
+.ai-result__list em {
+  display: block;
+}
+
+.ai-result__list strong {
+  color: var(--text);
+}
+
+.ai-result__list em {
+  color: var(--primary);
+  font-style: normal;
+  margin-top: 0.2rem;
 }
 
 .color-picker {

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import AiAssistant from "../components/AiAssistant";
 import NoteForm from "../components/NoteForm";
 import NoteList from "../components/NoteList";
 import { createNote, deleteNote, fetchNotes, updateNote } from "../lib/notes";
@@ -107,6 +108,8 @@ export default function Dashboard() {
       ) : (
         <NoteForm onSubmit={handleCreate} />
       )}
+
+      <AiAssistant noteCount={notes.length} />
 
       {error && (
         <div className="dashboard__error">

@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 export default function Home() {
   return (
     <section className="hero container">
-      <p className="hero__badge">Week 2 Assignment</p>
+      <p className="hero__badge">Week 3 AI Mini-Project</p>
       <h1 className="hero__title">
         Your ideas, <span className="hero__accent">illuminated</span>
       </h1>
       <p className="hero__subtitle">
         Lumenote is a personal notes app for students and thinkers. Capture study notes,
-        ideas, and reminders — all private to your account.
+        ideas, and reminders, then use AI to summarize your thinking and plan what to study next.
       </p>
       <div className="hero__actions">
         <Link to="/register" className="btn btn--primary">
@@ -30,8 +30,8 @@ export default function Home() {
           <p>Create, read, update, and delete notes with validation at every layer.</p>
         </article>
         <article className="feature card">
-          <h3>Custom colors</h3>
-          <p>Pick preset swatches or choose any color to organize your notes your way.</p>
+          <h3>AI study helper</h3>
+          <p>Summarize saved notes and generate useful follow-up notes from your own content.</p>
         </article>
       </div>
     </section>
