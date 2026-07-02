@@ -2,16 +2,20 @@
 
 A personal notes app for students and thinkers. Capture study notes, ideas, and reminders — all private to your account.
 
-Built for the **Week 2 Full-Stack Assignment**: database integration, authentication, CRUD, CI/CD, and documentation.
+Built for the **Week 3 AI API & Mini-Project Gate**: AI integration, Supabase backend, authentication, CRUD, deployment, testing notes, and documentation.
+
+**Student:** Angelica Vides  
+**Z-number:** TODO: add Z-number  
+**FAU email:** TODO: add FAU email
 
 > **Live URL:** *After Netlify deploy:*
 >
 >  [https://lumenote-angelica-vides.netlify.app](https://lumenote-angelica-vides.netlify.app/)
 
-> **Demo Video URL:**  
+> **Demo Video URL:** TODO: replace with the Week 3 3-5 minute demo video after recording  
 > [https://youtu.be/LH4xtiiTwuk](https://youtu.be/LH4xtiiTwuk)
 >
-> **Note:** This is the **Lumenote** app (Week 2). It is separate from the Week 1 portfolio project. Local folder: `lumenote/`.
+> **Note:** This is the **Lumenote** app (Week 3). It is separate from the Week 1 portfolio project. Local folder: `lumenote/`.
 
 ---
 
@@ -19,9 +23,9 @@ Built for the **Week 2 Full-Stack Assignment**: database integration, authentica
 
 **Problem:** Learners need a simple, secure place to write and organize notes without setup overhead.
 
-**Solution:** Lumenote provides email/password auth, a protected dashboard, and full CRUD on personal notes with pin and color organization.
+**Solution:** Lumenote provides email/password auth, a protected dashboard, full CRUD on personal notes, and AI-powered study support that summarizes saved notes and suggests useful next notes.
 
-**Stack:** React + Vite frontend · Supabase (PostgreSQL + Auth + RLS) · Netlify (manual CLI deploy) · GitHub Actions workflow in repo
+**Stack:** React + Vite frontend · Supabase (PostgreSQL + Auth + RLS + Edge Functions) · OpenAI API · Netlify (manual CLI deploy) · GitHub Actions workflow in repo
 
 ---
 
@@ -32,6 +36,9 @@ Built for the **Week 2 Full-Stack Assignment**: database integration, authentica
 - **CRUD** — Create, read, update, and delete notes with validation
 - **Pin notes** — Important notes stay at the top
 - **Color labels** — Visual organization (default, blue, green, amber, rose)
+- **AI summaries** — Summarize the authenticated user’s saved notes into an overview, key points, and follow-ups
+- **AI suggestions** — Generate personalized study notes/tasks from the user’s existing note content
+- **AI safety UX** — Loading states, API failure messages, and hourly rate-limit handling through Supabase
 - **CI/CD** — Automatic deploy to GitHub Pages on push to `main`
 
 ---
@@ -49,18 +56,20 @@ Built for the **Week 2 Full-Stack Assignment**: database integration, authentica
 | [DIAGRAMS.md](./DIAGRAMS.md)                   | Mermaid ERD, flows, sequences, component hierarchy |
 | [docs/DATABASE.md](./docs/DATABASE.md)         | Schema, RLS, design decisions                      |
 | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | How frontend, BaaS, and DB fit together            |
+| [docs/API_TESTS.md](./docs/API_TESTS.md)       | Endpoint documentation and core test cases         |
+| [docs/COST_ANALYSIS.md](./docs/COST_ANALYSIS.md) | AI API usage and cost estimate                   |
 | [ISSUES.md](./ISSUES.md)                       | GitHub issues and project board guide              |
 
 
 ## Project Status
 
-**Current phase: Step 2 complete** — Supabase client wired; next: [Step 3](./BUILD_STEPS.md) (run `supabase/schema.sql`).
+**Current phase: Week 3 implementation complete in code** — run the latest `supabase/schema.sql`, deploy the `ai-notes` Edge Function, add the OpenAI secret in Supabase, then redeploy the frontend.
 
 ```bash
 npm run dev   # requires Node 18+
 ```
 
-Then verify: landing → login → register → dashboard (dummy notes, local CRUD).
+Then verify: landing → register/login → dashboard → CRUD notes → AI summarize → AI suggestions.
 
 ---
 
@@ -105,6 +114,15 @@ npm install
 2. Open **SQL Editor** → run `[supabase/schema.sql](./supabase/schema.sql)`
 3. **Authentication → Providers → Email** → disable **Confirm email** (recommended for local dev)
 4. Copy **Project URL** and **anon public key** from **Settings → API**
+5. Deploy the AI Edge Function:
+   ```bash
+   supabase functions deploy ai-notes
+   ```
+6. Add the OpenAI secret to Supabase (never put this in `VITE_*` browser env vars):
+   ```bash
+   supabase secrets set OPENAI_API_KEY=sk-...
+   supabase secrets set OPENAI_MODEL=gpt-4o-mini
+   ```
 
 ### 4. Environment variables
 
@@ -120,6 +138,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 > Never commit `.env`. Only `.env.example` is tracked.
+> `OPENAI_API_KEY` belongs in Supabase Edge Function secrets, not in `.env`.
 
 ### 5. Run locally
 
@@ -162,6 +181,13 @@ Click **Pin** on a card — it moves to the **Pinned** section at the top.
 ### Delete a note
 
 Click **Delete** → confirm — note is removed from the database.
+
+### Use AI study tools
+
+1. Create at least one note
+2. Click **Summarize notes** to generate an overview, key points, and follow-up actions
+3. Click **Suggest study notes** to generate personalized next-note ideas from saved content
+4. If the API is unavailable or rate limited, Lumenote shows a friendly inline error
 
 ### Sign out
 
@@ -242,7 +268,7 @@ Live URL: `https://fau-ai-hootcamp-summer-2026.github.io/week2-Angelica-Vides/`
 
 ---
 
-### Demo video (2–3 min)
+### Demo video (3–5 min)
 
 Record on your **Netlify live URL** (best) or `http://localhost:5173`.
 
@@ -253,9 +279,11 @@ Record on your **Netlify live URL** (best) or `http://localhost:5173`.
 3. Create a note (title, body, color)
 4. Edit the note
 5. Pin the note
-6. Delete the note
-7. Sign out → `/dashboard` redirects to login
-8. Briefly show the live URL in the browser address bar
+6. Run **Summarize notes**
+7. Run **Suggest study notes**
+8. Delete the note
+9. Sign out → `/dashboard` redirects to login
+10. Briefly show the live URL in the browser address bar
 
 ### Troubleshooting
 
@@ -276,13 +304,17 @@ Record on your **Netlify live URL** (best) or `http://localhost:5173`.
 ├── .github/workflows/deploy.yml   # CI/CD
 ├── docs/
 │   ├── ARCHITECTURE.md
+│   ├── API_TESTS.md
+│   ├── COST_ANALYSIS.md
 │   └── DATABASE.md
 ├── src/
 │   ├── components/                  # Layout, NoteForm, NoteList, NoteCard
 │   ├── context/AuthContext.jsx      # Auth state
 │   ├── lib/                         # supabase, notes CRUD, validation
 │   └── pages/                       # Home, Login, Register, Dashboard
-├── supabase/schema.sql              # PostgreSQL schema + RLS
+├── supabase/
+│   ├── functions/ai-notes/           # Authenticated AI endpoint
+│   └── schema.sql                    # PostgreSQL schema + RLS
 ├── PLAN.md
 ├── BUILD_STEPS.md
 ├── DIAGRAMS.md
@@ -308,13 +340,15 @@ docs: complete assignment documentation
 
 ---
 
-## Demo Video Checklist (2–3 min)
+## Demo Video Checklist (3–5 min)
 
 - [ ] Show landing page
 - [ ] Register a new account
 - [ ] Log out and log back in
 - [ ] Create a note
 - [ ] Edit and pin a note
+- [ ] Generate an AI summary
+- [ ] Generate AI study suggestions
 - [ ] Delete a note
 - [ ] Briefly show live deployed URL
 
