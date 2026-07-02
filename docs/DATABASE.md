@@ -27,6 +27,7 @@ See also: [DIAGRAMS.md](../DIAGRAMS.md) for Mermaid ERD and flow diagrams.
 ```mermaid
 erDiagram
     AUTH_USERS ||--o{ NOTES : owns
+    AUTH_USERS ||--o{ AI_REQUESTS : makes
 
     AUTH_USERS {
         uuid id PK
@@ -43,6 +44,13 @@ erDiagram
         boolean pinned
         timestamptz created_at
         timestamptz updated_at
+    }
+
+    AI_REQUESTS {
+        uuid id PK
+        uuid user_id FK
+        string action
+        timestamptz created_at
     }
 ```
 
@@ -79,11 +87,25 @@ Created and secured by Supabase Auth. Application code interacts via the Auth AP
 - `notes_user_id_idx` on `user_id`
 - `notes_pinned_updated_idx` on `(user_id, pinned DESC, updated_at DESC)`
 
+### `ai_requests`
+
+Tracks authenticated AI calls for rate limiting. It does not store note content or AI responses.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PK, `gen_random_uuid()` | Unique AI request identifier |
+| `user_id` | UUID | NOT NULL, FK → `auth.users(id)` ON DELETE CASCADE | Owner |
+| `action` | TEXT | `summarize` or `suggest` | AI feature requested |
+| `created_at` | TIMESTAMPTZ | DEFAULT `now()` | Request timestamp |
+
+**Indexes:**
+- `ai_requests_user_created_idx` on `(user_id, created_at DESC)`
+
 ---
 
 ## Row Level Security (RLS)
 
-RLS is **enabled** on `notes`. All policies require `auth.uid() = user_id`:
+RLS is **enabled** on `notes` and `ai_requests`. All policies require `auth.uid() = user_id`:
 
 | Operation | Policy name | Rule |
 |-----------|-------------|------|
@@ -91,6 +113,8 @@ RLS is **enabled** on `notes`. All policies require `auth.uid() = user_id`:
 | INSERT | Users can insert own notes | `WITH CHECK (auth.uid() = user_id)` |
 | UPDATE | Users can update own notes | `USING` + `WITH CHECK` |
 | DELETE | Users can delete own notes | `auth.uid() = user_id` |
+| SELECT | Users can view own AI request log | `auth.uid() = user_id` |
+| INSERT | Users can insert own AI request log | `WITH CHECK (auth.uid() = user_id)` |
 
 Unauthenticated requests receive zero rows and cannot insert.
 
@@ -114,11 +138,12 @@ Unauthenticated requests receive zero rows and cannot insert.
 
 ## Design Decisions
 
-1. **Single `notes` table** — Keeps Week 2 scope focused on CRUD + auth; tags/folders deferred.
+1. **Single `notes` table** — Keeps the core note model focused on CRUD + auth; tags/folders deferred.
 2. **Cascade delete** — Deleting a user removes their notes automatically.
 3. **RLS over app-only checks** — Security enforced in the database, not only in React.
 4. **Custom hex colors** — Users pick any color; stored as `#RRGGBB`, rendered on card border.
 5. **Pin + color** — Lightweight organization without a separate categories table.
+6. **Separate AI log** — `ai_requests` supports rate limiting without storing generated content.
 
 ---
 
