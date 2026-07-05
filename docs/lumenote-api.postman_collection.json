@@ -1,0 +1,413 @@
+{
+  "info": {
+    "name": "Lumenote Week 3 API",
+    "description": "Auth, notes CRUD, and AI Edge Function tests for Lumenote.\n\nSetup:\n1. Import lumenote-api.postman_environment.json\n2. Set SUPABASE_URL and SUPABASE_ANON_KEY from your .env\n3. Run Auth → Sign up (or Log in) first to populate ACCESS_TOKEN\n4. Run Notes tests in order (Create saves NOTE_ID automatically)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Sign up",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.access_token) {",
+                  "    pm.environment.set('ACCESS_TOKEN', json.access_token);",
+                  "  }",
+                  "  if (json.user && json.user.id) {",
+                  "    pm.environment.set('USER_ID', json.user.id);",
+                  "  }",
+                  "}",
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{TEST_EMAIL}}\",\n  \"password\": \"{{TEST_PASSWORD}}\"\n}"
+            },
+            "url": "{{SUPABASE_URL}}/auth/v1/signup"
+          }
+        },
+        {
+          "name": "Log in",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Returns access_token', () => pm.expect(json.access_token).to.be.a('string'));",
+                  "pm.environment.set('ACCESS_TOKEN', json.access_token);",
+                  "if (json.user && json.user.id) {",
+                  "  pm.environment.set('USER_ID', json.user.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{TEST_EMAIL}}\",\n  \"password\": \"{{TEST_PASSWORD}}\"\n}"
+            },
+            "url": "{{SUPABASE_URL}}/auth/v1/token?grant_type=password"
+          }
+        },
+        {
+          "name": "Get current user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns user email', () => {",
+                  "  pm.expect(pm.response.json().email).to.eql(pm.environment.get('TEST_EMAIL'));",
+                  "});",
+                  "pm.environment.set('USER_ID', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }
+            ],
+            "url": "{{SUPABASE_URL}}/auth/v1/user"
+          }
+        },
+        {
+          "name": "Log in — invalid password (edge case)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{TEST_EMAIL}}\",\n  \"password\": \"wrong-password\"\n}"
+            },
+            "url": "{{SUPABASE_URL}}/auth/v1/token?grant_type=password"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notes CRUD",
+      "item": [
+        {
+          "name": "Create note",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const rows = pm.response.json();",
+                  "pm.test('Returns created note', () => pm.expect(rows[0].id).to.be.a('string'));",
+                  "pm.environment.set('NOTE_ID', rows[0].id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Prefer", "value": "return=representation" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{USER_ID}}\",\n  \"title\": \"Postman test note\",\n  \"body\": \"Created via API test.\",\n  \"color\": \"#2dd4bf\",\n  \"pinned\": false\n}"
+            },
+            "url": "{{SUPABASE_URL}}/rest/v1/notes"
+          }
+        },
+        {
+          "name": "Read notes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }
+            ],
+            "url": "{{SUPABASE_URL}}/rest/v1/notes?select=*"
+          }
+        },
+        {
+          "name": "Update note",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Title updated', () => {",
+                  "  pm.expect(pm.response.json()[0].title).to.eql('Updated via Postman');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Prefer", "value": "return=representation" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated via Postman\",\n  \"pinned\": true\n}"
+            },
+            "url": "{{SUPABASE_URL}}/rest/v1/notes?id=eq.{{NOTE_ID}}"
+          }
+        },
+        {
+          "name": "Delete note",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 204', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }
+            ],
+            "url": "{{SUPABASE_URL}}/rest/v1/notes?id=eq.{{NOTE_ID}}"
+          }
+        },
+        {
+          "name": "Create note — missing title (edge case)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Prefer", "value": "return=representation" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{USER_ID}}\",\n  \"title\": \"\",\n  \"body\": \"Should fail validation.\",\n  \"color\": \"#2dd4bf\"\n}"
+            },
+            "url": "{{SUPABASE_URL}}/rest/v1/notes"
+          }
+        },
+        {
+          "name": "Read notes — no JWT (unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('RLS returns no rows without user JWT', () => {",
+                  "  pm.expect(pm.response.json()).to.eql([]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" }
+            ],
+            "url": "{{SUPABASE_URL}}/rest/v1/notes?select=*"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Edge Function",
+      "item": [
+        {
+          "name": "Summarize notes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Returns summarize action', () => pm.expect(json.action).to.eql('summarize'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"summarize\"\n}"
+            },
+            "url": "{{SUPABASE_URL}}/functions/v1/ai-notes"
+          }
+        },
+        {
+          "name": "Suggest study notes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Returns suggest action', () => pm.expect(json.action).to.eql('suggest'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"suggest\"\n}"
+            },
+            "url": "{{SUPABASE_URL}}/functions/v1/ai-notes"
+          }
+        },
+        {
+          "name": "AI — no JWT (unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"summarize\"\n}"
+            },
+            "url": "{{SUPABASE_URL}}/functions/v1/ai-notes"
+          }
+        },
+        {
+          "name": "AI — invalid action (edge case)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"invalid\"\n}"
+            },
+            "url": "{{SUPABASE_URL}}/functions/v1/ai-notes"
+          }
+        }
+      ]
+    }
+  ]
+}
