@@ -5,10 +5,8 @@ A personal notes app for students and thinkers. Capture study notes, ideas, and 
 Built for the **Week 3 AI API & Mini-Project Gate**: AI integration, Supabase backend, authentication, CRUD, deployment, testing notes, and documentation.
 
 **Student:** Angelica Vides  
-**Z-number:** TODO: add Z-number  
-**FAU email:** TODO: add FAU email
-
-> **GitHub Repository:** [https://github.com/FAU-AI-HootCamp-Summer-2026/week3-Angelica-Vides](https://github.com/FAU-AI-HootCamp-Summer-2026/week3-Angelica-Vides)
+**Z-number:** Z23515404  
+**FAU email:** avides2019@fau.edu
 
 > **Live URL:**
 >
@@ -17,9 +15,11 @@ Built for the **Week 3 AI API & Mini-Project Gate**: AI integration, Supabase ba
 > **Demo Video URL:** TODO: replace with the Week 3 3-5 minute demo video after recording  
 > [https://youtu.be/LH4xtiiTwuk](https://youtu.be/LH4xtiiTwuk)
 >
-> **Note:** This is the **Lumenote** app (Week 3). It is separate from the Week 1 portfolio project. Local folder: `lumenote/`.
+> **Note:** This is the **Lumenote** app (Week 3). It is an updated version of the week 2 app. Local folder: `lumenote/`.
 
 ---
+
+
 
 ## Project Overview
 
@@ -30,6 +30,8 @@ Built for the **Week 3 AI API & Mini-Project Gate**: AI integration, Supabase ba
 **Stack:** React + Vite frontend · Supabase (PostgreSQL + Auth + RLS + Edge Functions) · OpenAI API · Netlify (manual CLI deploy) · GitHub Actions workflow in repo
 
 ---
+
+
 
 ## Features
 
@@ -45,22 +47,26 @@ Built for the **Week 3 AI API & Mini-Project Gate**: AI integration, Supabase ba
 
 ---
 
+
+
 ## Documentation Index
 
 
-| Document                                       | Description                                        |
-| ---------------------------------------------- | -------------------------------------------------- |
-| [PLAN.md](./PLAN.md)                           | Concept, scope, open decisions                     |
-| [DESIGN.md](./DESIGN.md)                       | Design system, wireframes, iteration checklist     |
-| [DESIGN_LOG.md](./DESIGN_LOG.md)               | Changelog of design iterations                     |
-| [mockup.html](./mockup.html)                   | Interactive static mockup — iterate design here    |
-| [BUILD_STEPS.md](./BUILD_STEPS.md)             | Incremental build steps with Verify checkpoints    |
-| [DIAGRAMS.md](./DIAGRAMS.md)                   | Mermaid ERD, flows, sequences, component hierarchy |
-| [docs/DATABASE.md](./docs/DATABASE.md)         | Schema, RLS, design decisions                      |
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | How frontend, BaaS, and DB fit together            |
-| [docs/API_TESTS.md](./docs/API_TESTS.md)       | Endpoint docs, Postman + Thunder Client test setup |
-| [docs/COST_ANALYSIS.md](./docs/COST_ANALYSIS.md) | AI API usage and cost estimate                   |
-| [ISSUES.md](./ISSUES.md)                       | GitHub issues and project board guide              |
+| Document                                         | Description                                        |
+| ------------------------------------------------ | -------------------------------------------------- |
+| [PLAN.md](./PLAN.md)                             | Concept, scope, open decisions                     |
+| [DESIGN.md](./DESIGN.md)                         | Design system, wireframes, iteration checklist     |
+| [DESIGN_LOG.md](./DESIGN_LOG.md)                 | Changelog of design iterations                     |
+| [mockup.html](./mockup.html)                     | Interactive static mockup — iterate design here    |
+| [BUILD_STEPS.md](./BUILD_STEPS.md)               | Incremental build steps with Verify checkpoints    |
+| [DIAGRAMS.md](./DIAGRAMS.md)                     | Mermaid ERD, flows, sequences, component hierarchy |
+| [docs/DATABASE.md](./docs/DATABASE.md)           | Schema, RLS, design decisions                      |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)   | How frontend, BaaS, and DB fit together            |
+| [docs/API_TESTS.md](./docs/API_TESTS.md)         | Endpoint docs and Postman test plan                |
+| [docs/COST_ANALYSIS.md](./docs/COST_ANALYSIS.md) | AI API usage and cost estimate                     |
+| [ISSUES.md](./ISSUES.md)                         | GitHub issues and project board guide              |
+
+
 
 
 ## Project Status
@@ -75,6 +81,8 @@ Then verify: landing → register/login → dashboard → CRUD notes → AI summ
 
 ---
 
+
+
 ## Architecture (Summary)
 
 ```
@@ -86,6 +94,8 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) and [DIAGRAMS.md](./DIAGRAMS.
 
 ---
 
+
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 18+ (20 recommended)
@@ -95,7 +105,11 @@ See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) and [DIAGRAMS.md](./DIAGRAMS.
 
 ---
 
+
+
 ## Installation & Setup
+
+
 
 ### 1. Clone your Classroom repository
 
@@ -104,11 +118,15 @@ git clone https://github.com/FAU-AI-HootCamp-Summer-2026/week3-Angelica-Vides.gi
 cd week3-Angelica-Vides
 ```
 
+
+
 ### 2. Install dependencies
 
 ```bash
 npm install
 ```
+
+
 
 ### 3. Configure Supabase
 
@@ -117,14 +135,16 @@ npm install
 3. **Authentication → Providers → Email** → disable **Confirm email** (recommended for local dev)
 4. Copy **Project URL** and **anon public key** from **Settings → API**
 5. Deploy the AI Edge Function:
-   ```bash
+  ```bash
    supabase functions deploy ai-notes
-   ```
+  ```
 6. Add the OpenAI secret to Supabase (never put this in `VITE_*` browser env vars):
-   ```bash
+  ```bash
    supabase secrets set OPENAI_API_KEY=sk-...
    supabase secrets set OPENAI_MODEL=gpt-4o-mini
-   ```
+  ```
+
+
 
 ### 4. Environment variables
 
@@ -142,6 +162,8 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 > Never commit `.env`. Only `.env.example` is tracked.
 > `OPENAI_API_KEY` belongs in Supabase Edge Function secrets, not in `.env`.
 
+
+
 ### 5. Run locally
 
 ```bash
@@ -152,7 +174,11 @@ Open [http://localhost:5173](http://localhost:5173)
 
 ---
 
+
+
 ## Usage Guide
+
+
 
 ### Register
 
@@ -160,10 +186,14 @@ Open [http://localhost:5173](http://localhost:5173)
 2. Enter email, password (6+ chars), and confirm password
 3. You are redirected to **My Notes** dashboard
 
+
+
 ### Log in
 
 1. Click **Log in**
 2. Enter credentials → dashboard loads your notes
+
+
 
 ### Create a note
 
@@ -171,10 +201,14 @@ Open [http://localhost:5173](http://localhost:5173)
 2. Choose a **Color** label
 3. Click **Save note** — it appears in the grid
 
+
+
 ### Edit a note
 
 1. Click **Edit** on a note card
 2. Update fields → **Save changes**
+
+
 
 ### Pin a note
 
@@ -191,11 +225,15 @@ Click **Delete** → confirm — note is removed from the database.
 3. Click **Suggest study notes** to generate personalized next-note ideas from saved content
 4. If the API is unavailable or rate limited, Lumenote shows a friendly inline error
 
+
+
 ### Sign out
 
 Click **Sign out** in the nav — session clears; dashboard is no longer accessible.
 
 ---
+
+
 
 ## Deployment
 
@@ -223,6 +261,8 @@ Uses your local `.env` at build time. **Do not** connect GitHub auto-deploy in N
   - **Site URL:** `https://YOUR-SITE-NAME.netlify.app`
   - **Redirect URLs:** add `https://YOUR-SITE-NAME.netlify.app/`**
 
+
+
 #### Deploy (whenever you want an updated live site)
 
 ```bash
@@ -248,6 +288,8 @@ Your repo still includes the GitHub Actions workflow for CI/CD credit — it sho
 
 ---
 
+
+
 ### GitHub Pages (alternatives)
 
 Option A — GitHub Actions · Option B — gh-pages branch
@@ -264,11 +306,13 @@ Option A — GitHub Actions · Option B — gh-pages branch
 npm run deploy:pages
 ```
 
-Instructor sets **Pages → Deploy from branch → `gh-pages` / root**
+Instructor sets **Pages → Deploy from branch →** `gh-pages` **/ root**
 
 Live URL: `https://fau-ai-hootcamp-summer-2026.github.io/week3-Angelica-Vides/`
 
 ---
+
+
 
 ### Demo video (3–5 min)
 
@@ -287,6 +331,8 @@ Record on your **Netlify live URL** (best) or `http://localhost:5173`.
 9. Sign out → `/dashboard` redirects to login
 10. Briefly show the live URL in the browser address bar
 
+
+
 ### Troubleshooting
 
 
@@ -300,6 +346,8 @@ Record on your **Netlify live URL** (best) or `http://localhost:5173`.
 
 ---
 
+
+
 ## Project Structure
 
 ```
@@ -310,10 +358,7 @@ Record on your **Netlify live URL** (best) or `http://localhost:5173`.
 │   ├── COST_ANALYSIS.md
 │   ├── DATABASE.md
 │   ├── lumenote-api.postman_collection.json
-│   ├── lumenote-api.postman_environment.json
-│   └── thunder-client/
-│       ├── thunder-collection_Lumenote Week 3 API.json
-│       └── thunder-environment_Lumenote Supabase.json
+│   └── lumenote-api.postman_environment.json
 ├── src/
 │   ├── components/                  # Layout, NoteForm, NoteList, NoteCard
 │   ├── context/AuthContext.jsx      # Auth state
@@ -331,6 +376,8 @@ Record on your **Netlify live URL** (best) or `http://localhost:5173`.
 
 ---
 
+
+
 ## Commit Convention
 
 Use conventional commits aligned with build steps:
@@ -347,6 +394,8 @@ docs: complete assignment documentation
 
 ---
 
+
+
 ## Demo Video Checklist (3–5 min)
 
 - [ ] Show landing page
@@ -360,6 +409,8 @@ docs: complete assignment documentation
 - [ ] Briefly show live deployed URL
 
 ---
+
+
 
 ## License
 

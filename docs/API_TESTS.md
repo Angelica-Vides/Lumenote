@@ -1,10 +1,12 @@
 # Lumenote — API Documentation & Test Plan
 
-Week 3 deliverable: document endpoints, run tests with **Postman** or **Thunder Client**, and verify auth, CRUD, AI, and error cases.
+Week 3 deliverable: document endpoints, run tests with **Postman**, and verify auth, CRUD, AI, and error cases.
+
+**Testing tool used:** Postman (assignment also allows Thunder Client or similar — Postman satisfies this requirement).
 
 **Base URL:** `https://YOUR_PROJECT_REF.supabase.co` (from `.env` → `VITE_SUPABASE_URL`)
 
-**Import ready-made tests:**
+**Import ready-made Postman tests:**
 
 
 | File                                                                             | Tool                |
@@ -12,8 +14,6 @@ Week 3 deliverable: document endpoints, run tests with **Postman** or **Thunder 
 | [lumenote-api.postman_collection.json](./lumenote-api.postman_collection.json)   | Postman             |
 | [lumenote-api.postman_environment.json](./lumenote-api.postman_environment.json) | Postman environment |
 
-
-Thunder Client (VS Code/Cursor) can import the same Postman collection JSON.
 
 ---
 
@@ -311,7 +311,7 @@ Table: `notes` · RLS: users only access `user_id = auth.uid()`
 
 ## 4. How to run tests in Postman
 
-1. Install [Postman](https://www.postman.com/downloads/) (or use Thunder Client in VS Code/Cursor).
+1. Install [Postman](https://www.postman.com/downloads/).
 2. **Import** → `docs/lumenote-api.postman_collection.json`
 3. **Import** → `docs/lumenote-api.postman_environment.json`
 4. Edit environment variables:
@@ -326,116 +326,6 @@ Table: `notes` · RLS: users only access `user_id = auth.uid()`
 Each request includes **Tests** tab assertions (green = pass).
 
 ---
-
-
-
-## 4b. How to run tests in Thunder Client (Cursor / VS Code)
-
-Thunder Client lives **inside Cursor** — no separate app needed.
-
-### Step 1 — Install the extension
-
-1. Open Cursor
-2. Press **Cmd + Shift + X** (Extensions)
-3. Search **Thunder Client**
-4. Install **Thunder Client** by Ranga Vadhineni (lightning bolt icon)
-
-
-
-### Step 2 — Open Thunder Client
-
-1. Click the **Thunder Client** icon in the left Activity Bar (lightning bolt)
-2. You’ll see tabs: **Activity**, **Collections**, **Env**, **Tests**
-
-
-
-### Step 3 — Import the environment
-
-1. Click the **Env** tab
-2. Click the **Menu (⋯)** at the top → **Import**
-3. Choose file:
-  ```
-   docs/thunder-client/thunder-environment_Lumenote Supabase.json
-  ```
-4. Click the **Lumenote Supabase** environment in the list to activate it (highlighted)
-
-
-
-### Step 4 — Set your variables
-
-1. With **Lumenote Supabase** selected, click **Edit** (pencil icon) or the **⋯** menu → **Edit**
-2. Update these from your `.env` file:
-
-
-| Variable            | Copy from                          |
-| ------------------- | ---------------------------------- |
-| `SUPABASE_URL`      | `VITE_SUPABASE_URL` in `.env`      |
-| `SUPABASE_ANON_KEY` | `VITE_SUPABASE_ANON_KEY` in `.env` |
-| `TEST_EMAIL`        | Your Lumenote login email          |
-| `TEST_PASSWORD`     | Your Lumenote password             |
-
-
-1. Leave `ACCESS_TOKEN`, `USER_ID`, and `NOTE_ID` **empty** — Thunder Client fills them after **Log in**
-2. **Save**
-
-
-
-### Step 5 — Import the collection
-
-1. Click the **Collections** tab
-2. Click **Menu (⋯)** → **Import**
-3. Choose file:
-  ```
-   docs/thunder-client/thunder-collection_Lumenote Week 3 API.json
-  ```
-4. You should see **Lumenote Week 3 API** with folders: Auth, Notes CRUD, AI Edge Function
-
-> **Note:** Import may require Thunder Client **Pro**. If Import is locked, use the Postman files in `docs/` instead, or create requests manually using the endpoint tables in sections 1–3 above.
-
-
-
-### Step 6 — Run requests (same order as Postman)
-
-Make sure **Lumenote Supabase** is the active environment (check **Env** tab — it should be selected).
-
-
-| Order | Request                              | Expected                                           |
-| ----- | ------------------------------------ | -------------------------------------------------- |
-| 1     | **Auth → Log in**                    | Status **200**; saves `ACCESS_TOKEN` automatically |
-| 2     | **Auth → Get current user**          | Status **200**                                     |
-| 3     | **Notes CRUD → Create note**         | Status **201**                                     |
-| 4     | **Notes CRUD → Read notes**          | Status **200**                                     |
-| 5     | **Notes CRUD → Update note**         | Status **200**                                     |
-| 6     | **Notes CRUD → Delete note**         | Status **204**                                     |
-| 7     | **Notes CRUD → Read notes — no JWT** | Status **200**, empty `[]`                         |
-| 8     | **AI → Summarize notes**             | Status **200** (need saved notes)                  |
-| 9     | **AI → Suggest study notes**         | Status **200**                                     |
-
-
-Click a request → click **Send** (top right of request panel).
-
-### Step 7 — Check test results
-
-After **Send**, open the **Tests** tab under the response:
-
-- **Passed** (green) = test OK
-- **Failed** (red) = check environment variables or run **Log in** first
-
-
-
-### Postman
-
-
-|               | Postman                            |     |
-| ------------- | ---------------------------------- | --- |
-| Where it runs | Separate app                       |     |
-| Import files  | `docs/lumenote-api.postman_*.json` |     |
-|               |                                    |     |
-
-
----
-
-
 
 ## 5. Test cases — Auth
 
