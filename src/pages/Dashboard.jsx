@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import AiAssistant from "../components/AiAssistant";
-import NoteForm from "../components/NoteForm";
 import NoteList from "../components/NoteList";
 import NoteListSkeleton from "../components/NoteListSkeleton";
-import { createNote, deleteNote, fetchNotes, updateNote } from "../lib/notes";
+import { deleteNote, fetchNotes, updateNote } from "../lib/notes";
 
 function sortNotes(notes) {
   return [...notes].sort((a, b) => {
@@ -14,11 +13,10 @@ function sortNotes(notes) {
 }
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const navigate = useNavigate();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [editingNote, setEditingNote] = useState(null);
   const [pendingNoteId, setPendingNoteId] = useState(null);
 
   const loadNotes = useCallback(async () => {
@@ -39,21 +37,8 @@ export default function Dashboard() {
     loadNotes();
   }, [loadNotes]);
 
-  const handleCreate = async (form) => {
-    const created = await createNote(user.id, form);
-    setNotes((prev) => sortNotes([created, ...prev]));
-    setError("");
-  };
-
-  const handleUpdate = async (form) => {
-    const updated = await updateNote(editingNote.id, {
-      title: form.title,
-      body: form.body,
-      color: form.color,
-    });
-    setNotes((prev) => sortNotes(prev.map((n) => (n.id === updated.id ? updated : n))));
-    setEditingNote(null);
-    setError("");
+  const handleEdit = (note) => {
+    navigate(`/notes/${note.id}/edit`);
   };
 
   const handleTogglePin = async (note) => {
@@ -76,7 +61,6 @@ export default function Dashboard() {
     try {
       await deleteNote(noteId);
       setNotes((prev) => prev.filter((n) => n.id !== noteId));
-      if (editingNote?.id === noteId) setEditingNote(null);
       setError("");
     } catch (err) {
       setError(err.message || "Could not delete note.");
@@ -87,28 +71,17 @@ export default function Dashboard() {
 
   return (
     <section className="dashboard container">
-      <header className="dashboard__header">
+      <header className="dashboard__header dashboard__header--tabs">
         <div>
-          <h1>My Notes</h1>
-          <p className="muted">Create, edit, format, and pin your personal notes</p>
+          <p className="muted">
+            {loading
+              ? "Loading your notes…"
+              : notes.length === 0
+                ? "You have no notes yet — open the New Note tab to get started."
+                : `${notes.length} note${notes.length === 1 ? "" : "s"} · pinned notes stay at the top`}
+          </p>
         </div>
       </header>
-
-      {editingNote ? (
-        <NoteForm
-          key={editingNote.id}
-          initial={{
-            title: editingNote.title,
-            body: editingNote.body,
-            color: editingNote.color,
-          }}
-          submitLabel="Save changes"
-          onSubmit={handleUpdate}
-          onCancel={() => setEditingNote(null)}
-        />
-      ) : (
-        <NoteForm onSubmit={handleCreate} />
-      )}
 
       <AiAssistant noteCount={notes.length} />
 
@@ -131,7 +104,7 @@ export default function Dashboard() {
       ) : (
         <NoteList
           notes={notes}
-          onEdit={setEditingNote}
+          onEdit={handleEdit}
           onDelete={handleDelete}
           onTogglePin={handleTogglePin}
           pendingNoteId={pendingNoteId}

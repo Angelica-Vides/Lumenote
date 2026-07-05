@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import NoteEditorPage from "./pages/NoteEditorPage";
 
 export default function App() {
   return (
@@ -24,6 +25,22 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notes/new"
+              element={
+                <ProtectedRoute>
+                  <NoteEditorPage mode="new" />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notes/:noteId/edit"
+              element={
+                <ProtectedRoute>
+                  <NoteEditorPage />
                 </ProtectedRoute>
               }
             />

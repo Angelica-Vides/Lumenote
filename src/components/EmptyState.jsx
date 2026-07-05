@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function EmptyState() {
   return (
     <div className="empty-state card empty-state--wide">
@@ -16,8 +18,10 @@ export default function EmptyState() {
         </svg>
       </div>
       <h3>No notes yet</h3>
-      <p>Create your first note using the form above.</p>
-      <p className="empty-state__hint">↑ Start with a title and hit Save note</p>
+      <p>Your notes live here. Switch to the New Note tab to write with rich formatting and AI study tools.</p>
+      <Link to="/notes/new" className="btn btn--primary empty-state__action">
+        Create your first note
+      </Link>
     </div>
   );
 }

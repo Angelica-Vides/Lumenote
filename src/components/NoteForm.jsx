@@ -7,6 +7,7 @@ import { validateNote } from "../lib/validation";
 export default function NoteForm({
   initial = { title: "", body: "", color: DEFAULT_NOTE_COLOR },
   submitLabel = "Save note",
+  showHeading = true,
   onSubmit,
   onCancel,
 }) {
@@ -47,7 +48,9 @@ export default function NoteForm({
 
   return (
     <form className="note-form card" onSubmit={handleSubmit} noValidate>
-      <h3 className="note-form__title">{onCancel ? "Edit note" : "New note"}</h3>
+      {showHeading && (
+        <h3 className="note-form__title">{onCancel ? "Edit note" : "New note"}</h3>
+      )}
       {error && (
         <p className="form-error" role="alert">
           {error}

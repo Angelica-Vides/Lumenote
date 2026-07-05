@@ -45,6 +45,13 @@ export async function fetchNotes() {
   return data;
 }
 
+export async function fetchNote(noteId) {
+  const { data, error } = await supabase.from("notes").select("*").eq("id", noteId).single();
+
+  if (error) throw new Error(mapDbError(error));
+  return data;
+}
+
 export async function createNote(userId, input) {
   const validationError = validateNote(input);
   if (validationError) throw new Error(validationError);
