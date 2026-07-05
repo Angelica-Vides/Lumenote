@@ -25,3 +25,6 @@ npm-debug.log*
 
 # Netlify CLI local state (site link — not committed)
 .netlify/
+
+# Supabase CLI local link state
+supabase/.temp/
