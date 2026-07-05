@@ -58,7 +58,7 @@ Built for the **Week 3 AI API & Mini-Project Gate**: AI integration, Supabase ba
 | [DIAGRAMS.md](./DIAGRAMS.md)                   | Mermaid ERD, flows, sequences, component hierarchy |
 | [docs/DATABASE.md](./docs/DATABASE.md)         | Schema, RLS, design decisions                      |
 | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | How frontend, BaaS, and DB fit together            |
-| [docs/API_TESTS.md](./docs/API_TESTS.md)       | Endpoint docs, Postman collection, test cases      |
+| [docs/API_TESTS.md](./docs/API_TESTS.md)       | Endpoint docs, Postman + Thunder Client test setup |
 | [docs/COST_ANALYSIS.md](./docs/COST_ANALYSIS.md) | AI API usage and cost estimate                   |
 | [ISSUES.md](./ISSUES.md)                       | GitHub issues and project board guide              |
 
@@ -310,7 +310,10 @@ Record on your **Netlify live URL** (best) or `http://localhost:5173`.
 │   ├── COST_ANALYSIS.md
 │   ├── DATABASE.md
 │   ├── lumenote-api.postman_collection.json
-│   └── lumenote-api.postman_environment.json
+│   ├── lumenote-api.postman_environment.json
+│   └── thunder-client/
+│       ├── thunder-collection_Lumenote Week 3 API.json
+│       └── thunder-environment_Lumenote Supabase.json
 ├── src/
 │   ├── components/                  # Layout, NoteForm, NoteList, NoteCard
 │   ├── context/AuthContext.jsx      # Auth state

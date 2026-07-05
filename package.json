@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:pages": "VITE_BASE_PATH=/week2-Angelica-Vides/ vite build",
+    "build:pages": "VITE_BASE_PATH=/week3-Angelica-Vides/ vite build",
     "deploy:pages": "npm run build:pages && gh-pages -d dist",
     "deploy:netlify": "npm run build && npx netlify-cli deploy --prod --dir=dist",
     "preview": "vite preview"
