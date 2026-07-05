@@ -30,6 +30,13 @@ export default function Home() {
           <p>Create, read, update, and delete notes with validation at every layer.</p>
         </article>
         <article className="feature card">
+          <h3>Rich formatting</h3>
+          <p>
+            Add headings, bullet lists, fonts, and images in the note editor — like a lightweight word
+            processor.
+          </p>
+        </article>
+        <article className="feature card">
           <h3>AI study helper</h3>
           <p>Summarize saved notes and generate useful follow-up notes from your own content.</p>
         </article>

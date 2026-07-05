@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import LogoMark from "./LogoMark";
 
 export default function Layout({ children }) {
   const { user, loading, signOut } = useAuth();
@@ -19,7 +20,8 @@ export default function Layout({ children }) {
       <header className="header">
         <div className="container header__inner">
           <Link to="/" className="logo">
-            <span className="logo__mark">✦</span> Lumenote
+            <LogoMark className="logo__icon" size={30} />
+            <span>Lumenote</span>
           </Link>
           <nav className="nav">
             {user && (
@@ -49,7 +51,7 @@ export default function Layout({ children }) {
       <main className="main">{children}</main>
       <footer className="footer">
         <div className="container">
-          <p>Lumenote — Week 2 Assignment</p>
+          <p>Lumenote — Week 3 AI Mini-Project · FAU HootCamp Summer 2026</p>
         </div>
       </footer>
     </div>

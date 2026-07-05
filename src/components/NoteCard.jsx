@@ -1,4 +1,5 @@
-import { notePreviewText } from "../lib/noteBody";
+import { useState } from "react";
+import { isEmptyNoteBody, notePreviewText, sanitizeNoteHtml } from "../lib/noteBody";
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -8,13 +9,37 @@ function formatDate(iso) {
   });
 }
 
+function hasRichContent(body = "") {
+  return body.includes("<") && !isEmptyNoteBody(body);
+}
+
 export default function NoteCard({ note, onEdit, onDelete, onTogglePin, disabled = false }) {
-  const preview = notePreviewText(note.body);
+  const [expanded, setExpanded] = useState(false);
+  const rich = hasRichContent(note.body);
+  const plainPreview = notePreviewText(note.body);
 
   return (
     <article className="note-card card" style={{ "--note-color": note.color }}>
       <h4 className="note-card__title">{note.title}</h4>
-      <p className="note-card__body">{preview}</p>
+
+      {rich ? (
+        <>
+          <div
+            className={`note-card__body note-card__body--rich${expanded ? " note-card__body--expanded" : ""}`}
+            dangerouslySetInnerHTML={{ __html: sanitizeNoteHtml(note.body) }}
+          />
+          <button
+            type="button"
+            className="note-card__expand btn btn--ghost btn--sm"
+            onClick={() => setExpanded((open) => !open)}
+          >
+            {expanded ? "Show less" : "View full note"}
+          </button>
+        </>
+      ) : (
+        <p className="note-card__body">{plainPreview}</p>
+      )}
+
       <p className="note-card__meta">
         Updated {formatDate(note.updated_at)} · {note.color}
       </p>

@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import AiAssistant from "../components/AiAssistant";
 import NoteForm from "../components/NoteForm";
 import NoteList from "../components/NoteList";
+import NoteListSkeleton from "../components/NoteListSkeleton";
 import { createNote, deleteNote, fetchNotes, updateNote } from "../lib/notes";
 
 function sortNotes(notes) {
@@ -89,7 +90,7 @@ export default function Dashboard() {
       <header className="dashboard__header">
         <div>
           <h1>My Notes</h1>
-          <p className="muted">Create, edit, and pin your personal notes</p>
+          <p className="muted">Create, edit, format, and pin your personal notes</p>
         </div>
       </header>
 
@@ -123,9 +124,9 @@ export default function Dashboard() {
       )}
 
       {loading ? (
-        <div className="loading-panel" role="status" aria-live="polite">
-          <span className="spinner" aria-hidden="true" />
-          Loading notes…
+        <div className="dashboard__loading" role="status" aria-live="polite">
+          <span className="visually-hidden">Loading notes…</span>
+          <NoteListSkeleton />
         </div>
       ) : (
         <NoteList

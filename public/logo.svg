@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Lumenote">
+  <defs>
+    <linearGradient id="logo-glow" x1="40" y1="20" x2="140" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5eead4" />
+      <stop offset="100%" stop-color="#14b8a6" />
+    </linearGradient>
+    <radialGradient id="logo-spark" cx="90" cy="48" r="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="180" height="180" rx="40" fill="#0c0e12" />
+  <circle cx="90" cy="48" r="34" fill="url(#logo-spark)" />
+  <circle cx="90" cy="48" r="18" fill="url(#logo-glow)" />
+  <rect x="48" y="68" width="84" height="92" rx="14" fill="#151922" stroke="#2dd4bf" stroke-width="4" />
+  <path d="M68 98h44M68 112h36M68 126h40" stroke="#2dd4bf" stroke-width="5" stroke-linecap="round" opacity="0.85" />
+</svg>
