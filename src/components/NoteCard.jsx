@@ -1,3 +1,5 @@
+import { notePreviewText } from "../lib/noteBody";
+
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString(undefined, {
     month: "short",
@@ -7,11 +9,7 @@ function formatDate(iso) {
 }
 
 export default function NoteCard({ note, onEdit, onDelete, onTogglePin, disabled = false }) {
-  const preview = note.body
-    ? note.body.length > 140
-      ? `${note.body.slice(0, 140)}…`
-      : note.body
-    : "No content";
+  const preview = notePreviewText(note.body);
 
   return (
     <article className="note-card card" style={{ "--note-color": note.color }}>

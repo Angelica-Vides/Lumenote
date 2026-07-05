@@ -12,11 +12,18 @@
     "build": "vite build",
     "build:pages": "VITE_BASE_PATH=/week3-Angelica-Vides/ vite build",
     "deploy:pages": "npm run build:pages && gh-pages -d dist",
-    "deploy:netlify": "npm run build && npx netlify-cli deploy --prod --dir=dist",
+    "deploy:netlify": "npm run build && netlify deploy --prod --dir=dist",
     "preview": "vite preview"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
+    "@tiptap/extension-font-family": "^3.27.1",
+    "@tiptap/extension-image": "^3.27.1",
+    "@tiptap/extension-text-style": "^3.27.1",
+    "@tiptap/extension-underline": "^3.27.1",
+    "@tiptap/react": "^3.27.1",
+    "@tiptap/starter-kit": "^3.27.1",
+    "dompurify": "^3.4.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0"
@@ -24,6 +31,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "gh-pages": "^6.3.0",
+    "netlify-cli": "^23.12.3",
     "vite": "^5.4.11"
   }
 }

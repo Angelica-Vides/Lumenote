@@ -703,6 +703,172 @@ a:hover {
   font-size: 0.85em;
 }
 
+.visually-hidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.field--rte {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.field__hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.rte-editor {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.rte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.rte-toolbar__btn {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  border-radius: 6px;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.rte-toolbar__btn:hover:not(:disabled) {
+  background: rgba(45, 212, 191, 0.12);
+  border-color: rgba(45, 212, 191, 0.25);
+}
+
+.rte-toolbar__btn--active {
+  background: rgba(45, 212, 191, 0.18);
+  border-color: rgba(45, 212, 191, 0.45);
+  color: var(--primary);
+}
+
+.rte-toolbar__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.rte-toolbar__underline {
+  text-decoration: underline;
+}
+
+.rte-toolbar__divider {
+  width: 1px;
+  height: 1.25rem;
+  background: var(--border);
+  margin: 0 0.15rem;
+}
+
+.rte-toolbar__select-wrap {
+  display: inline-flex;
+}
+
+.rte-toolbar__select {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.8rem;
+  padding: 0.35rem 0.45rem;
+}
+
+.rte-editor__content,
+.ProseMirror {
+  min-height: 180px;
+  padding: 0.85rem 1rem;
+  outline: none;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.rte-editor__content:focus,
+.ProseMirror:focus {
+  box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.35);
+}
+
+.rte-editor__content h2,
+.ProseMirror h2 {
+  font-size: 1.25rem;
+  margin: 0.75rem 0 0.35rem;
+}
+
+.rte-editor__content h3,
+.ProseMirror h3 {
+  font-size: 1.05rem;
+  margin: 0.65rem 0 0.25rem;
+}
+
+.rte-editor__content ul,
+.rte-editor__content ol,
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.25rem;
+  margin: 0.35rem 0;
+}
+
+.rte-editor__content img,
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+}
+
+.rte-editor__content p,
+.ProseMirror p {
+  margin: 0.35rem 0;
+}
+
+.rte-editor--loading {
+  opacity: 0.85;
+}
+
+.rte-toolbar--placeholder {
+  min-height: 42px;
+  background: var(--surface);
+}
+
+.rte-editor__content--placeholder {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.rte-toolbar__btn--image {
+  margin-left: auto;
+  border-color: rgba(45, 212, 191, 0.35);
+  background: rgba(45, 212, 191, 0.1);
+}
+
+@media (max-width: 640px) {
+  .rte-toolbar__btn--image {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .footer {
   border-top: 1px solid var(--border);
   padding: 1.25rem 0;

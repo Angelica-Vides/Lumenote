@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS notes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   title TEXT NOT NULL CHECK (char_length(trim(title)) >= 1 AND char_length(title) <= 120),
-  body TEXT NOT NULL DEFAULT '' CHECK (char_length(body) <= 10000),
+  body TEXT NOT NULL DEFAULT '' CHECK (char_length(body) <= 50000),
   color TEXT NOT NULL DEFAULT '#2dd4bf' CHECK (color ~ '^#[0-9A-Fa-f]{6}$'),
   pinned BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),

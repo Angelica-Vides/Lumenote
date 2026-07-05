@@ -26,11 +26,20 @@ function cleanJson(content: string) {
   return content.replace(/^```json\s*/i, "").replace(/\s*```$/i, "").trim();
 }
 
+function stripHtml(html: string) {
+  if (!html.includes("<")) return html.trim();
+  return html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function buildPrompt(action: AiAction, notes: Array<{ title: string; body: string; pinned: boolean }>) {
   const noteContext = notes
     .map((note, index) => {
       const pinLabel = note.pinned ? "pinned" : "unpinned";
-      return `${index + 1}. ${note.title} (${pinLabel})\n${note.body || "No body text."}`;
+      const bodyText = stripHtml(note.body || "") || "No body text.";
+      return `${index + 1}. ${note.title} (${pinLabel})\n${bodyText}`;
     })
     .join("\n\n");
 

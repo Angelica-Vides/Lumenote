@@ -54,7 +54,7 @@ export async function createNote(userId, input) {
     .insert({
       user_id: userId,
       title: input.title.trim(),
-      body: input.body?.trim() || "",
+      body: input.body ?? "",
       color: input.color || DEFAULT_NOTE_COLOR,
       pinned: false,
     })
@@ -72,12 +72,12 @@ export async function updateNote(noteId, updates) {
       body: updates.body ?? "",
       color: updates.color ?? DEFAULT_NOTE_COLOR,
     });
-    if (validationError && updates.title !== undefined) throw new Error(validationError);
+    if (validationError) throw new Error(validationError);
   }
 
   const payload = {};
   if (updates.title !== undefined) payload.title = updates.title.trim();
-  if (updates.body !== undefined) payload.body = updates.body.trim();
+  if (updates.body !== undefined) payload.body = updates.body ?? "";
   if (updates.color !== undefined) payload.color = updates.color;
   if (updates.pinned !== undefined) payload.pinned = updates.pinned;
 

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import ColorPicker, { DEFAULT_NOTE_COLOR } from "./ColorPicker";
+import RichTextEditor from "./RichTextEditor";
+import { useAuth } from "../context/AuthContext";
 import { validateNote } from "../lib/validation";
 
 export default function NoteForm({
@@ -8,6 +10,7 @@ export default function NoteForm({
   onSubmit,
   onCancel,
 }) {
+  const { user } = useAuth();
   const [form, setForm] = useState(initial);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -62,17 +65,19 @@ export default function NoteForm({
         />
       </label>
 
-      <label className="field">
+      <div className="field field--rte">
         <span>Body</span>
-        <textarea
-          name="body"
+        <RichTextEditor
           value={form.body}
-          onChange={handleChange}
-          placeholder="Write your note…"
-          rows={6}
-          maxLength={10000}
+          userId={user?.id}
+          onChange={(body) => {
+            setForm((prev) => ({ ...prev, body }));
+            setError("");
+          }}
+          onError={setError}
         />
-      </label>
+        <p className="field__hint">Format with headings, lists, fonts, and images (max 2 MB each).</p>
+      </div>
 
       <label className="field">
         <span>Color</span>
