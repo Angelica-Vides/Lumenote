@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NoteEditorPage from "./pages/NoteEditorPage";
+import NoteViewPage from "./pages/NoteViewPage";
 
 export default function App() {
   return (
@@ -41,6 +42,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <NoteEditorPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notes/:noteId"
+              element={
+                <ProtectedRoute>
+                  <NoteViewPage />
                 </ProtectedRoute>
               }
             />

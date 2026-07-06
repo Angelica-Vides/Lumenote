@@ -850,6 +850,132 @@ a:hover {
   display: none;
 }
 
+.note-view-page {
+  max-width: 820px;
+}
+
+.note-view-page__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.note-view-page__back {
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.note-view-page__back:hover {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.note-view-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.note-view-page__loading,
+.note-view-page__error {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 0;
+  color: var(--muted);
+}
+
+.note-view-page__error {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.note-view-page__paper {
+  position: relative;
+  background: color-mix(in srgb, var(--note-color, #2dd4bf) 82%, #ffffff 18%);
+  border: 1px solid color-mix(in srgb, var(--note-color, #2dd4bf) 55%, #000000 12%);
+  border-radius: 4px 4px 18px 4px;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--note-color, #2dd4bf) 40%, #ffffff 60%) inset,
+    3px 6px 18px rgba(0, 0, 0, 0.24);
+  padding: 1.75rem 1.5rem 1.5rem;
+  --note-ink: #1e293b;
+  --note-ink-muted: rgba(30, 41, 59, 0.72);
+}
+
+.note-view-page__paper--pinned {
+  padding-top: 2rem;
+}
+
+.note-view-page__title {
+  font-size: 1.65rem;
+  line-height: 1.25;
+  color: var(--note-ink);
+  margin-bottom: 0.35rem;
+  padding-right: 1.5rem;
+}
+
+.note-view-page__meta {
+  font-size: 0.85rem;
+  color: var(--note-ink-muted);
+  margin-bottom: 1.25rem;
+}
+
+.note-view-page__body {
+  color: var(--note-ink);
+  line-height: 1.65;
+  font-size: 1rem;
+}
+
+.note-view-page__empty,
+.note-view-page__hint {
+  margin-top: 0.5rem;
+}
+
+.note-body-render h2 {
+  font-size: 1.35rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.note-body-render h3 {
+  font-size: 1.12rem;
+  margin: 0.85rem 0 0.4rem;
+}
+
+.note-body-render p {
+  margin: 0.5rem 0;
+}
+
+.note-body-render p:has(> img:only-child) {
+  text-align: center;
+}
+
+.note-body-render img {
+  display: block;
+  max-width: min(100%, 640px);
+  width: auto;
+  height: auto;
+  margin: 1.25rem auto;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 0.5rem;
+  border: 1px solid rgba(30, 41, 59, 0.14);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+  object-fit: contain;
+}
+
+.note-body-render ul,
+.note-body-render ol {
+  padding-left: 1.4rem;
+  margin: 0.5rem 0;
+}
+
 .note-card__body--rich h2 {
   font-size: 0.95rem;
   margin: 0.35rem 0 0.15rem;
@@ -866,11 +992,27 @@ a:hover {
   margin: 0.2rem 0;
 }
 
+.note-card__body--rich:has(img) {
+  max-height: 9rem;
+}
+
+.note-card__body--rich p:has(> img:only-child) {
+  text-align: center;
+}
+
 .note-card__body--rich img {
-  max-width: 100%;
-  max-height: 120px;
-  border-radius: 6px;
-  margin: 0.35rem 0;
+  display: block;
+  max-width: calc(100% - 0.25rem);
+  width: auto;
+  max-height: 150px;
+  height: auto;
+  margin: 0.5rem auto;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 0.35rem;
+  border: 1px solid rgba(30, 41, 59, 0.16);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+  object-fit: contain;
 }
 
 .note-card__expand {
@@ -1204,35 +1346,42 @@ a:hover {
 .ProseMirror ul,
 .ProseMirror ol,
 .note-card__body--rich ul,
-.note-card__body--rich ol {
+.note-card__body--rich ol,
+.note-body-render ul,
+.note-body-render ol {
   padding-left: 1.25rem;
   margin: 0.35rem 0;
 }
 
 .rte-editor__content ul.list-bullet-disc,
 .ProseMirror ul.list-bullet-disc,
-.note-card__body--rich ul.list-bullet-disc {
+.note-card__body--rich ul.list-bullet-disc,
+.note-body-render ul.list-bullet-disc {
   list-style-type: disc;
 }
 
 .rte-editor__content ul.list-bullet-circle,
 .ProseMirror ul.list-bullet-circle,
-.note-card__body--rich ul.list-bullet-circle {
+.note-card__body--rich ul.list-bullet-circle,
+.note-body-render ul.list-bullet-circle {
   list-style-type: circle;
 }
 
 .rte-editor__content ul.list-bullet-square,
 .ProseMirror ul.list-bullet-square,
-.note-card__body--rich ul.list-bullet-square {
+.note-card__body--rich ul.list-bullet-square,
+.note-body-render ul.list-bullet-square {
   list-style-type: square;
 }
 
 .rte-editor__content ul.list-bullet-dash,
 .ProseMirror ul.list-bullet-dash,
 .note-card__body--rich ul.list-bullet-dash,
+.note-body-render ul.list-bullet-dash,
 .rte-editor__content ul.list-bullet-star,
 .ProseMirror ul.list-bullet-star,
-.note-card__body--rich ul.list-bullet-star {
+.note-card__body--rich ul.list-bullet-star,
+.note-body-render ul.list-bullet-star {
   list-style: none;
   padding-left: 1.35rem;
 }
@@ -1240,15 +1389,18 @@ a:hover {
 .rte-editor__content ul.list-bullet-dash > li,
 .ProseMirror ul.list-bullet-dash > li,
 .note-card__body--rich ul.list-bullet-dash > li,
+.note-body-render ul.list-bullet-dash > li,
 .rte-editor__content ul.list-bullet-star > li,
 .ProseMirror ul.list-bullet-star > li,
-.note-card__body--rich ul.list-bullet-star > li {
+.note-card__body--rich ul.list-bullet-star > li,
+.note-body-render ul.list-bullet-star > li {
   position: relative;
 }
 
 .rte-editor__content ul.list-bullet-dash > li::before,
 .ProseMirror ul.list-bullet-dash > li::before,
-.note-card__body--rich ul.list-bullet-dash > li::before {
+.note-card__body--rich ul.list-bullet-dash > li::before,
+.note-body-render ul.list-bullet-dash > li::before {
   content: "–";
   position: absolute;
   left: -0.9rem;
@@ -1257,7 +1409,8 @@ a:hover {
 
 .rte-editor__content ul.list-bullet-star > li::before,
 .ProseMirror ul.list-bullet-star > li::before,
-.note-card__body--rich ul.list-bullet-star > li::before {
+.note-card__body--rich ul.list-bullet-star > li::before,
+.note-body-render ul.list-bullet-star > li::before {
   content: "★";
   position: absolute;
   left: -1rem;
@@ -1267,31 +1420,36 @@ a:hover {
 
 .rte-editor__content ol.list-ol-decimal,
 .ProseMirror ol.list-ol-decimal,
-.note-card__body--rich ol.list-ol-decimal {
+.note-card__body--rich ol.list-ol-decimal,
+.note-body-render ol.list-ol-decimal {
   list-style-type: decimal;
 }
 
 .rte-editor__content ol.list-ol-lower-alpha,
 .ProseMirror ol.list-ol-lower-alpha,
-.note-card__body--rich ol.list-ol-lower-alpha {
+.note-card__body--rich ol.list-ol-lower-alpha,
+.note-body-render ol.list-ol-lower-alpha {
   list-style-type: lower-alpha;
 }
 
 .rte-editor__content ol.list-ol-upper-alpha,
 .ProseMirror ol.list-ol-upper-alpha,
-.note-card__body--rich ol.list-ol-upper-alpha {
+.note-card__body--rich ol.list-ol-upper-alpha,
+.note-body-render ol.list-ol-upper-alpha {
   list-style-type: upper-alpha;
 }
 
 .rte-editor__content ol.list-ol-lower-roman,
 .ProseMirror ol.list-ol-lower-roman,
-.note-card__body--rich ol.list-ol-lower-roman {
+.note-card__body--rich ol.list-ol-lower-roman,
+.note-body-render ol.list-ol-lower-roman {
   list-style-type: lower-roman;
 }
 
 .rte-editor__content ol.list-ol-upper-roman,
 .ProseMirror ol.list-ol-upper-roman,
-.note-card__body--rich ol.list-ol-upper-roman {
+.note-card__body--rich ol.list-ol-upper-roman,
+.note-body-render ol.list-ol-upper-roman {
   list-style-type: upper-roman;
 }
 
@@ -1315,10 +1473,17 @@ a:hover {
 
 .rte-editor__content img,
 .ProseMirror img {
-  max-width: 100%;
+  display: block;
+  max-width: min(100%, 560px);
+  width: auto;
   height: auto;
-  border-radius: 8px;
-  margin: 0.5rem 0;
+  margin: 0.75rem auto;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  object-fit: contain;
 }
 
 .rte-editor__content p,

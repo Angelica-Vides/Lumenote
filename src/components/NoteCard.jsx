@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import PinBadge from "./PinBadge";
 import { isEmptyNoteBody, notePreviewText, sanitizeNoteHtml } from "../lib/noteBody";
 
 function formatDate(iso) {
@@ -13,23 +14,17 @@ function hasRichContent(body = "") {
   return body.includes("<") && !isEmptyNoteBody(body);
 }
 
-function PinBadge() {
-  return (
-    <div className="note-card__pin" aria-hidden="true" title="Pinned">
-      <svg viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="11" r="9" fill="#ef4444" />
-        <circle cx="13" cy="8" r="2.5" fill="#fca5a5" opacity="0.85" />
-        <path d="M16 20v14" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M12 34h8" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" />
-      </svg>
-    </div>
-  );
+function shouldOfferFullView(body = "") {
+  if (isEmptyNoteBody(body)) return false;
+  if (hasRichContent(body)) return true;
+  return notePreviewText(body).endsWith("…");
 }
 
 export default function NoteCard({ note, onEdit, onDelete, onTogglePin, disabled = false }) {
-  const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
   const rich = hasRichContent(note.body);
   const plainPreview = notePreviewText(note.body);
+  const showFullView = shouldOfferFullView(note.body);
 
   return (
     <article
@@ -40,21 +35,22 @@ export default function NoteCard({ note, onEdit, onDelete, onTogglePin, disabled
       <h4 className="note-card__title">{note.title}</h4>
 
       {rich ? (
-        <>
-          <div
-            className={`note-card__body note-card__body--rich${expanded ? " note-card__body--expanded" : ""}`}
-            dangerouslySetInnerHTML={{ __html: sanitizeNoteHtml(note.body) }}
-          />
-          <button
-            type="button"
-            className="note-card__expand btn btn--ghost btn--sm"
-            onClick={() => setExpanded((open) => !open)}
-          >
-            {expanded ? "Show less" : "View full note"}
-          </button>
-        </>
+        <div
+          className="note-card__body note-card__body--rich"
+          dangerouslySetInnerHTML={{ __html: sanitizeNoteHtml(note.body) }}
+        />
       ) : (
         <p className="note-card__body">{plainPreview}</p>
+      )}
+
+      {showFullView && (
+        <button
+          type="button"
+          className="note-card__expand btn btn--ghost btn--sm"
+          onClick={() => navigate(`/notes/${note.id}`)}
+        >
+          View full note
+        </button>
       )}
 
       <p className="note-card__meta">Updated {formatDate(note.updated_at)}</p>
