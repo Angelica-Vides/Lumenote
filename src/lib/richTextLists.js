@@ -29,19 +29,19 @@ export const StyledOrderedList = OrderedList.extend({
 });
 
 export const BULLET_STYLE_OPTIONS = [
-  { label: "Disc •", value: "list-bullet-disc" },
-  { label: "Circle ○", value: "list-bullet-circle" },
-  { label: "Square ■", value: "list-bullet-square" },
-  { label: "Dash –", value: "list-bullet-dash" },
-  { label: "Star ★", value: "list-bullet-star" },
+  { value: "list-bullet-disc", icon: "•", title: "Disc bullets" },
+  { value: "list-bullet-circle", icon: "○", title: "Circle bullets" },
+  { value: "list-bullet-square", icon: "■", title: "Square bullets" },
+  { value: "list-bullet-dash", icon: "–", title: "Dash bullets" },
+  { value: "list-bullet-star", icon: "★", title: "Star bullets" },
 ];
 
 export const ORDERED_STYLE_OPTIONS = [
-  { label: "1, 2, 3", value: "list-ol-decimal" },
-  { label: "a, b, c", value: "list-ol-lower-alpha" },
-  { label: "A, B, C", value: "list-ol-upper-alpha" },
-  { label: "i, ii, iii", value: "list-ol-lower-roman" },
-  { label: "I, II, III", value: "list-ol-upper-roman" },
+  { value: "list-ol-decimal", icon: "1", title: "Numbered list" },
+  { value: "list-ol-lower-alpha", icon: "a", title: "Lowercase letter list" },
+  { value: "list-ol-upper-alpha", icon: "A", title: "Uppercase letter list" },
+  { value: "list-ol-lower-roman", icon: "i", title: "Lowercase roman list" },
+  { value: "list-ol-upper-roman", icon: "I", title: "Uppercase roman list" },
 ];
 
 export function getDefaultBulletStyle() {

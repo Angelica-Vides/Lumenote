@@ -41,6 +41,77 @@ function formatCount(value) {
   return value.toLocaleString();
 }
 
+function ListStyleDropdown({ label, options, currentValue, isActive, onSelect }) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (!rootRef.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  const currentOption = options.find((option) => option.value === currentValue) || options[0];
+
+  return (
+    <div className="rte-toolbar__dropdown" ref={rootRef}>
+      <button
+        type="button"
+        className={`rte-toolbar__dropdown-trigger${isActive ? " rte-toolbar__dropdown-trigger--active" : ""}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={label}
+        onClick={() => setOpen((wasOpen) => !wasOpen)}
+      >
+        <span className="rte-toolbar__list-icon">{currentOption.icon}</span>
+        <span className="rte-toolbar__dropdown-caret" aria-hidden="true">
+          ▾
+        </span>
+      </button>
+
+      {open && (
+        <div className="rte-toolbar__dropdown-menu rte-toolbar__group" role="listbox" aria-label={label}>
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              role="option"
+              aria-selected={isActive && currentValue === option.value}
+              className={`rte-toolbar__btn rte-toolbar__dropdown-option${
+                isActive && currentValue === option.value ? " rte-toolbar__btn--active" : ""
+              }`}
+              title={option.title}
+              onClick={() => {
+                onSelect(option.value);
+                setOpen(false);
+              }}
+            >
+              <span className="rte-toolbar__list-icon">{option.icon}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function RichTextEditor({ value, onChange, userId, onError }) {
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
@@ -128,6 +199,22 @@ export default function RichTextEditor({ value, onChange, userId, onError }) {
     ? editor.getAttributes("orderedList").class || getDefaultOrderedStyle()
     : getDefaultOrderedStyle();
 
+  const handleBulletStyle = (styleClass) => {
+    if (editor.isActive("bulletList") && currentBulletStyle === styleClass) {
+      editor.chain().focus().toggleBulletList().run();
+      return;
+    }
+    applyBulletStyle(styleClass);
+  };
+
+  const handleOrderedStyle = (styleClass) => {
+    if (editor.isActive("orderedList") && currentOrderedStyle === styleClass) {
+      editor.chain().focus().toggleOrderedList().run();
+      return;
+    }
+    applyOrderedStyle(styleClass);
+  };
+
   const atLimit = charCount >= NOTE_BODY_TEXT_LIMIT;
   const nearLimit = charCount >= NOTE_BODY_TEXT_LIMIT * 0.9;
 
@@ -192,51 +279,21 @@ export default function RichTextEditor({ value, onChange, userId, onError }) {
 
         <span className="rte-toolbar__divider" aria-hidden="true" />
 
-        <ToolbarButton
-          title="Bullet list"
-          active={editor.isActive("bulletList")}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-        >
-          • List
-        </ToolbarButton>
-        <label className="rte-toolbar__select-wrap">
-          <span className="visually-hidden">Bullet style</span>
-          <select
-            className="rte-toolbar__select"
-            value={currentBulletStyle}
-            onChange={(e) => applyBulletStyle(e.target.value)}
-            aria-label="Bullet style"
-          >
-            {BULLET_STYLE_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <ListStyleDropdown
+          label="Bullet list style"
+          options={BULLET_STYLE_OPTIONS}
+          currentValue={currentBulletStyle}
+          isActive={editor.isActive("bulletList")}
+          onSelect={handleBulletStyle}
+        />
 
-        <ToolbarButton
-          title="Numbered list"
-          active={editor.isActive("orderedList")}
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        >
-          1. List
-        </ToolbarButton>
-        <label className="rte-toolbar__select-wrap">
-          <span className="visually-hidden">Numbered list style</span>
-          <select
-            className="rte-toolbar__select"
-            value={currentOrderedStyle}
-            onChange={(e) => applyOrderedStyle(e.target.value)}
-            aria-label="Numbered list style"
-          >
-            {ORDERED_STYLE_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <ListStyleDropdown
+          label="Numbered list style"
+          options={ORDERED_STYLE_OPTIONS}
+          currentValue={currentOrderedStyle}
+          isActive={editor.isActive("orderedList")}
+          onSelect={handleOrderedStyle}
+        />
 
         <label className="rte-toolbar__select-wrap">
           <span className="visually-hidden">Font</span>

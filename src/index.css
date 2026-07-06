@@ -1382,6 +1382,73 @@ a:hover {
   margin: 0 0.15rem;
 }
 
+.rte-toolbar__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.12rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(12, 14, 18, 0.35);
+}
+
+.rte-toolbar__group .rte-toolbar__btn {
+  min-width: 1.65rem;
+  padding: 0.35rem 0.4rem;
+}
+
+.rte-toolbar__dropdown {
+  position: relative;
+}
+
+.rte-toolbar__dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 1.85rem;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(12, 14, 18, 0.35);
+  color: var(--text);
+  font-size: 0.8rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.rte-toolbar__dropdown-trigger:hover {
+  background: rgba(45, 212, 191, 0.12);
+  border-color: rgba(45, 212, 191, 0.25);
+}
+
+.rte-toolbar__dropdown-trigger--active {
+  background: rgba(45, 212, 191, 0.18);
+  border-color: rgba(45, 212, 191, 0.45);
+  color: var(--primary);
+}
+
+.rte-toolbar__dropdown-caret {
+  font-size: 0.65rem;
+  opacity: 0.75;
+  line-height: 1;
+}
+
+.rte-toolbar__dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  left: 0;
+  z-index: 30;
+  box-shadow: var(--shadow);
+}
+
+.rte-toolbar__list-icon {
+  display: inline-block;
+  min-width: 0.85rem;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
 .rte-toolbar__select-wrap {
   display: inline-flex;
 }
