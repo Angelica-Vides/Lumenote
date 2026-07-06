@@ -4,7 +4,17 @@ import Image from "@tiptap/extension-image";
 import Underline from "@tiptap/extension-underline";
 import { TextStyle, FontFamily } from "@tiptap/extension-text-style";
 import { useEffect, useRef, useState } from "react";
+import { stripHtml } from "../lib/noteBody";
 import { uploadNoteImage } from "../lib/noteImages";
+import {
+  BULLET_STYLE_OPTIONS,
+  ORDERED_STYLE_OPTIONS,
+  StyledBulletList,
+  StyledOrderedList,
+  getDefaultBulletStyle,
+  getDefaultOrderedStyle,
+} from "../lib/richTextLists";
+import { NOTE_BODY_TEXT_LIMIT } from "../lib/validation";
 
 const FONT_OPTIONS = [
   { label: "Default", value: "" },
@@ -27,16 +37,25 @@ function ToolbarButton({ active, onClick, children, title }) {
   );
 }
 
+function formatCount(value) {
+  return value.toLocaleString();
+}
+
 export default function RichTextEditor({ value, onChange, userId, onError }) {
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
+  const [charCount, setCharCount] = useState(() => stripHtml(value || "").length);
 
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: { levels: [2, 3] },
+        bulletList: false,
+        orderedList: false,
       }),
+      StyledBulletList,
+      StyledOrderedList,
       Underline,
       TextStyle,
       FontFamily,
@@ -50,7 +69,9 @@ export default function RichTextEditor({ value, onChange, userId, onError }) {
       },
     },
     onUpdate: ({ editor: current }) => {
-      onChange(current.getHTML());
+      const html = current.getHTML();
+      setCharCount(stripHtml(html).length);
+      onChange(html);
     },
   });
 
@@ -60,6 +81,7 @@ export default function RichTextEditor({ value, onChange, userId, onError }) {
     const next = value || "";
     if (next !== current) {
       editor.commands.setContent(next, false);
+      setCharCount(stripHtml(next).length);
     }
   }, [editor, value]);
 
@@ -81,6 +103,33 @@ export default function RichTextEditor({ value, onChange, userId, onError }) {
     }
     editor.chain().focus().setFontFamily(fontFamily).run();
   };
+
+  const applyBulletStyle = (styleClass) => {
+    const chain = editor.chain().focus();
+    if (!editor.isActive("bulletList")) {
+      chain.toggleBulletList();
+    }
+    chain.updateAttributes("bulletList", { class: styleClass }).run();
+  };
+
+  const applyOrderedStyle = (styleClass) => {
+    const chain = editor.chain().focus();
+    if (!editor.isActive("orderedList")) {
+      chain.toggleOrderedList();
+    }
+    chain.updateAttributes("orderedList", { class: styleClass }).run();
+  };
+
+  const currentBulletStyle = editor.isActive("bulletList")
+    ? editor.getAttributes("bulletList").class || getDefaultBulletStyle()
+    : getDefaultBulletStyle();
+
+  const currentOrderedStyle = editor.isActive("orderedList")
+    ? editor.getAttributes("orderedList").class || getDefaultOrderedStyle()
+    : getDefaultOrderedStyle();
+
+  const atLimit = charCount >= NOTE_BODY_TEXT_LIMIT;
+  const nearLimit = charCount >= NOTE_BODY_TEXT_LIMIT * 0.9;
 
   const handleImagePick = async (event) => {
     const file = event.target.files?.[0];
@@ -150,6 +199,22 @@ export default function RichTextEditor({ value, onChange, userId, onError }) {
         >
           • List
         </ToolbarButton>
+        <label className="rte-toolbar__select-wrap">
+          <span className="visually-hidden">Bullet style</span>
+          <select
+            className="rte-toolbar__select"
+            value={currentBulletStyle}
+            onChange={(e) => applyBulletStyle(e.target.value)}
+            aria-label="Bullet style"
+          >
+            {BULLET_STYLE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <ToolbarButton
           title="Numbered list"
           active={editor.isActive("orderedList")}
@@ -157,6 +222,21 @@ export default function RichTextEditor({ value, onChange, userId, onError }) {
         >
           1. List
         </ToolbarButton>
+        <label className="rte-toolbar__select-wrap">
+          <span className="visually-hidden">Numbered list style</span>
+          <select
+            className="rte-toolbar__select"
+            value={currentOrderedStyle}
+            onChange={(e) => applyOrderedStyle(e.target.value)}
+            aria-label="Numbered list style"
+          >
+            {ORDERED_STYLE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <label className="rte-toolbar__select-wrap">
           <span className="visually-hidden">Font</span>
@@ -195,6 +275,14 @@ export default function RichTextEditor({ value, onChange, userId, onError }) {
       </div>
 
       <EditorContent editor={editor} />
+
+      <div
+        className={`rte-editor__counter${nearLimit ? " rte-editor__counter--warn" : ""}${atLimit ? " rte-editor__counter--limit" : ""}`}
+        aria-live="polite"
+      >
+        {formatCount(charCount)} / {formatCount(NOTE_BODY_TEXT_LIMIT)} characters
+        {atLimit && " · limit reached"}
+      </div>
     </div>
   );
 }

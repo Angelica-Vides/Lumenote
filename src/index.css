@@ -1088,6 +1088,23 @@ a:hover {
   margin: 0;
 }
 
+.field__hint-warn {
+  color: #fbbf24;
+}
+
+.field__label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.field__counter {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
 .rte-editor {
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -1185,9 +1202,115 @@ a:hover {
 .rte-editor__content ul,
 .rte-editor__content ol,
 .ProseMirror ul,
-.ProseMirror ol {
+.ProseMirror ol,
+.note-card__body--rich ul,
+.note-card__body--rich ol {
   padding-left: 1.25rem;
   margin: 0.35rem 0;
+}
+
+.rte-editor__content ul.list-bullet-disc,
+.ProseMirror ul.list-bullet-disc,
+.note-card__body--rich ul.list-bullet-disc {
+  list-style-type: disc;
+}
+
+.rte-editor__content ul.list-bullet-circle,
+.ProseMirror ul.list-bullet-circle,
+.note-card__body--rich ul.list-bullet-circle {
+  list-style-type: circle;
+}
+
+.rte-editor__content ul.list-bullet-square,
+.ProseMirror ul.list-bullet-square,
+.note-card__body--rich ul.list-bullet-square {
+  list-style-type: square;
+}
+
+.rte-editor__content ul.list-bullet-dash,
+.ProseMirror ul.list-bullet-dash,
+.note-card__body--rich ul.list-bullet-dash,
+.rte-editor__content ul.list-bullet-star,
+.ProseMirror ul.list-bullet-star,
+.note-card__body--rich ul.list-bullet-star {
+  list-style: none;
+  padding-left: 1.35rem;
+}
+
+.rte-editor__content ul.list-bullet-dash > li,
+.ProseMirror ul.list-bullet-dash > li,
+.note-card__body--rich ul.list-bullet-dash > li,
+.rte-editor__content ul.list-bullet-star > li,
+.ProseMirror ul.list-bullet-star > li,
+.note-card__body--rich ul.list-bullet-star > li {
+  position: relative;
+}
+
+.rte-editor__content ul.list-bullet-dash > li::before,
+.ProseMirror ul.list-bullet-dash > li::before,
+.note-card__body--rich ul.list-bullet-dash > li::before {
+  content: "–";
+  position: absolute;
+  left: -0.9rem;
+  font-weight: 700;
+}
+
+.rte-editor__content ul.list-bullet-star > li::before,
+.ProseMirror ul.list-bullet-star > li::before,
+.note-card__body--rich ul.list-bullet-star > li::before {
+  content: "★";
+  position: absolute;
+  left: -1rem;
+  font-size: 0.72rem;
+  top: 0.15rem;
+}
+
+.rte-editor__content ol.list-ol-decimal,
+.ProseMirror ol.list-ol-decimal,
+.note-card__body--rich ol.list-ol-decimal {
+  list-style-type: decimal;
+}
+
+.rte-editor__content ol.list-ol-lower-alpha,
+.ProseMirror ol.list-ol-lower-alpha,
+.note-card__body--rich ol.list-ol-lower-alpha {
+  list-style-type: lower-alpha;
+}
+
+.rte-editor__content ol.list-ol-upper-alpha,
+.ProseMirror ol.list-ol-upper-alpha,
+.note-card__body--rich ol.list-ol-upper-alpha {
+  list-style-type: upper-alpha;
+}
+
+.rte-editor__content ol.list-ol-lower-roman,
+.ProseMirror ol.list-ol-lower-roman,
+.note-card__body--rich ol.list-ol-lower-roman {
+  list-style-type: lower-roman;
+}
+
+.rte-editor__content ol.list-ol-upper-roman,
+.ProseMirror ol.list-ol-upper-roman,
+.note-card__body--rich ol.list-ol-upper-roman {
+  list-style-type: upper-roman;
+}
+
+.rte-editor__counter {
+  padding: 0.45rem 0.85rem 0.55rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-align: right;
+  background: var(--surface);
+}
+
+.rte-editor__counter--warn {
+  color: #fbbf24;
+}
+
+.rte-editor__counter--limit {
+  color: #f87171;
+  font-weight: 600;
 }
 
 .rte-editor__content img,

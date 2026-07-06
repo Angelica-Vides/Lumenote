@@ -2,7 +2,8 @@ import { useState } from "react";
 import ColorPicker, { DEFAULT_NOTE_COLOR } from "./ColorPicker";
 import RichTextEditor from "./RichTextEditor";
 import { useAuth } from "../context/AuthContext";
-import { validateNote } from "../lib/validation";
+import { validateNote, NOTE_TITLE_LIMIT, NOTE_BODY_TEXT_LIMIT } from "../lib/validation";
+import { stripHtml } from "../lib/noteBody";
 
 export default function NoteForm({
   initial = { title: "", body: "", color: DEFAULT_NOTE_COLOR },
@@ -58,13 +59,16 @@ export default function NoteForm({
       )}
 
       <label className="field">
-        <span>Title</span>
+        <span className="field__label-row">
+          <span>Title</span>
+          <span className="field__counter">{form.title.length} / {NOTE_TITLE_LIMIT}</span>
+        </span>
         <input
           name="title"
           value={form.title}
           onChange={handleChange}
           placeholder="Note title"
-          maxLength={120}
+          maxLength={NOTE_TITLE_LIMIT}
         />
       </label>
 
@@ -79,7 +83,16 @@ export default function NoteForm({
           }}
           onError={setError}
         />
-        <p className="field__hint">Format with headings, lists, fonts, and images (max 2 MB each).</p>
+        <p className="field__hint">
+          Up to {NOTE_BODY_TEXT_LIMIT.toLocaleString()} characters of text. Use headings, lists, fonts,
+          and images (max 2 MB each).
+          {stripHtml(form.body).length >= NOTE_BODY_TEXT_LIMIT * 0.9 && (
+            <span className="field__hint-warn">
+              {" "}
+              You are approaching the character limit.
+            </span>
+          )}
+        </p>
       </div>
 
       <label className="field">

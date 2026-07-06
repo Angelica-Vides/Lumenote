@@ -2,6 +2,10 @@ import { stripHtml } from "./noteBody";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export const NOTE_TITLE_LIMIT = 120;
+export const NOTE_BODY_TEXT_LIMIT = 20000;
+export const NOTE_BODY_HTML_LIMIT = 100000;
+
 export const DEFAULT_NOTE_COLOR = "#2dd4bf";
 
 export const COLOR_PRESETS = [
@@ -46,9 +50,13 @@ export function mapAuthError(message) {
 export function validateNote({ title, body = "", color = DEFAULT_NOTE_COLOR }) {
   const trimmedTitle = title.trim();
   if (!trimmedTitle) return "Title is required.";
-  if (trimmedTitle.length > 120) return "Title must be 120 characters or fewer.";
-  if (stripHtml(body).length > 10000) return "Body text must be 10,000 characters or fewer.";
-  if (body.length > 50000) return "Note content is too large.";
+  if (trimmedTitle.length > NOTE_TITLE_LIMIT) {
+    return `Title must be ${NOTE_TITLE_LIMIT.toLocaleString()} characters or fewer.`;
+  }
+  if (stripHtml(body).length > NOTE_BODY_TEXT_LIMIT) {
+    return `Body text must be ${NOTE_BODY_TEXT_LIMIT.toLocaleString()} characters or fewer.`;
+  }
+  if (body.length > NOTE_BODY_HTML_LIMIT) return "Note content is too large.";
   if (!isValidHexColor(color)) return "Invalid color format.";
   return null;
 }
