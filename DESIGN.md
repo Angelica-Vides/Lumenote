@@ -2,7 +2,7 @@
 
 Living design doc. Update this file and `mockup.html` as you iterate. Log changes in [DESIGN_LOG.md](./DESIGN_LOG.md).
 
-**Design status:** v0.2 — decisions locked (see [PLAN.md §9](./PLAN.md#9-design-decisions-locked))
+**Design status:** v0.3 — tabbed dashboard, sticky notes, rich-text editor (see [PLAN.md §10](./PLAN.md#10-design-decisions-locked-v03))
 
 ---
 
@@ -46,7 +46,7 @@ Notes store a **hex color** (e.g. `#3b82f6`) in the database. The UI provides:
 1. **Preset swatches** — quick picks (teal, blue, green, violet, rose, amber)
 2. **Custom picker** — native `<input type="color">` for any hex value
 
-Card left border uses the note's stored color directly.
+Card background uses the note's stored **hex color** as sticky-note paper. Pinned notes show a **red pushpin** at the top-right corner.
 
 ### Typography
 
@@ -87,38 +87,41 @@ Card left border uses the note's stored color directly.
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 3b. Dashboard `/dashboard` — grid layout ✅
+### 3b. My Notes tab `/dashboard` ✅
 
-Form on top, **card grid** below. Pinned section first.
+Tab bar: **My Notes | New Note**. Notes appear as a **sticky-note grid** (pinned section first). AI assistant panel below the header.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  My Notes                                    [ Refresh ]    │
-│  ┌─ New note ──────────────────────────────────────────┐   │
-│  │ Title · Body · [swatches] [custom color picker]      │   │
-│  └──────────────────────────────────────────────────────┘   │
+│  [Logo] Lumenote                         user@  Sign out   │
+│  [ My Notes ]  [ New Note ]                                 │
+├─────────────────────────────────────────────────────────────┤
+│  AI STUDY ASSISTANT  [ Summarize ] [ Suggest ]              │
 │  PINNED (1)                                                 │
-│  ┌──────────┐ ┌──────────┐                                 │
-│  │ note     │ │ note     │   ← card grid                   │
-│  │ [Pin][Edit][Delete]    │                                 │
-│  └──────────┘ └──────────┘                                 │
+│  📌┌──────────┐ ┌──────────┐                               │
+│    │ sticky   │ │ sticky   │   ← colored paper + tilt      │
+│    │ note     │ │ note     │                               │
+│    │ Pin Edit Delete          │                               │
+│    └──────────┘ └──────────┘                               │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 3c. Dashboard empty state ✅
+### 3c. New Note tab `/notes/new` ✅
 
-When user has zero notes, hide the grid and show:
+Rich-text editor (TipTap) with toolbar: bold, headings, bullet/numbered list styles, fonts, image upload. Character counter shown below editor.
+
+### 3d. Dashboard empty state ✅
+
+When user has zero notes on **My Notes**:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │              [ SVG illustration — notebook + glow ]         │
 │              No notes yet                                   │
-│              Create your first note above to get started.   │
-│              [ optional: subtle arrow pointing to form ]    │
+│              Switch to the New Note tab to get started.       │
+│              [ Create your first note ]                     │
 └─────────────────────────────────────────────────────────────┘
 ```
-
-Preview in mockup: **Dashboard (empty)** tab.
 
 ---
 
@@ -126,13 +129,16 @@ Preview in mockup: **Dashboard (empty)** tab.
 
 | Component | Used on | Notes |
 |-----------|---------|-------|
-| `Layout` | All pages | Header, nav, footer |
+| `Layout` | All pages | Header, logo → dashboard when logged in, footer |
+| `NotesTabs` | Logged-in routes | My Notes \| New Note tab bar |
 | `Hero` | Landing | Teal accent on key word |
 | `AuthCard` | Login, Register | Centered form |
-| `NoteForm` | Dashboard | Preset swatches + custom color input |
-| `NoteGrid` | Dashboard | Responsive card grid |
-| `NoteCard` | Dashboard | Border color = note.color hex; **Pin button on card** |
-| `EmptyState` | Dashboard | SVG illustration + copy |
+| `NoteForm` | New / Edit note pages | Title, color, wraps RichTextEditor |
+| `RichTextEditor` | NoteForm | TipTap toolbar + character counter |
+| `NoteList` | Dashboard | Pinned + all notes sections |
+| `NoteCard` | Dashboard | Sticky-note style; pin badge when pinned |
+| `EmptyState` | Dashboard | SVG illustration + link to New Note |
+| `AiAssistant` | Dashboard | Summarize + suggest AI features |
 | `ProtectedRoute` | Router | Redirect if anonymous |
 
 ---
@@ -141,12 +147,13 @@ Preview in mockup: **Dashboard (empty)** tab.
 
 | Interaction | Behavior |
 |-------------|----------|
-| **Create note** | Submit form → note appears in grid |
-| **Custom color** | Pick swatch OR use color input → stored as `#RRGGBB` |
-| **Edit note** | Edit button → form pre-fills including color |
+| **Create note** | New Note tab → save → redirect to My Notes grid |
+| **Custom color** | Pick swatch OR use color input → sticky-note paper color |
+| **Edit note** | Edit on card → `/notes/:id/edit` page |
 | **Delete note** | Delete → confirm dialog |
-| **Pin note** | **Pin button on card** → toggles pinned; pinned section sorts first |
-| **Empty state** | Shown when `notes.length === 0` after load |
+| **Pin note** | Pin button on card → pushpin badge; pinned section sorts first |
+| **Rich text** | TipTap toolbar; list style dropdowns; image upload to Storage |
+| **Empty state** | Shown when `notes.length === 0` on My Notes tab |
 | **Auth (dev)** | Email confirmation **disabled** in Supabase |
 
 ---
@@ -163,10 +170,11 @@ Preview in mockup: **Dashboard (empty)** tab.
 ## 7. Design Checklist
 
 - [x] Accent color: teal
-- [x] Dashboard: form + card grid
-- [x] Note density: card grid
+- [x] Dashboard: My Notes tab + separate New Note tab
+- [x] Note density: sticky-note card grid
 - [x] Custom note colors (hex + presets)
-- [x] Pin: button on card
+- [x] Rich-text editor with character counter
+- [x] Pin: button + corner pushpin badge
 - [x] Empty state: illustration
 - [x] Email confirm: off for dev
 - [x] Final review of mockup in browser

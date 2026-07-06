@@ -75,7 +75,7 @@ Created and secured by Supabase Auth. Application code interacts via the Auth AP
 | `id` | UUID | PK, `gen_random_uuid()` | Unique note identifier |
 | `user_id` | UUID | NOT NULL, FK → `auth.users(id)` ON DELETE CASCADE | Owner |
 | `title` | TEXT | NOT NULL, 1–120 chars (trimmed) | Note heading |
-| `body` | TEXT | DEFAULT `''`, max 10,000 chars | Note content |
+| `body` | TEXT | DEFAULT `''`, max 100,000 chars stored; plain text validated ≤ 20,000 | Rich-text HTML from TipTap; images via Storage URLs |
 | `color` | TEXT | DEFAULT `'#2dd4bf'`, hex check `#RRGGBB` | User-chosen color (swatch or custom picker) |
 | `pinned` | BOOLEAN | DEFAULT `false` | Pin to top of list |
 | `created_at` | TIMESTAMPTZ | DEFAULT `now()` | Creation time |
@@ -100,6 +100,16 @@ Tracks authenticated AI calls for rate limiting. It does not store note content 
 
 **Indexes:**
 - `ai_requests_user_created_idx` on `(user_id, created_at DESC)`
+
+### Storage: `note-images`
+
+Public Supabase Storage bucket for note body images (JPEG, PNG, GIF, WebP; max 2 MB).
+
+| Path pattern | Example | Access |
+|--------------|---------|--------|
+| `{user_id}/{uuid}.{ext}` | `abc-123/photo.jpg` | Upload: owner only; read: public URL |
+
+Setup: run [`supabase/migrations/002_note_images_storage.sql`](../supabase/migrations/002_note_images_storage.sql).
 
 ---
 
@@ -141,9 +151,10 @@ Unauthenticated requests receive zero rows and cannot insert.
 1. **Single `notes` table** — Keeps the core note model focused on CRUD + auth; tags/folders deferred.
 2. **Cascade delete** — Deleting a user removes their notes automatically.
 3. **RLS over app-only checks** — Security enforced in the database, not only in React.
-4. **Custom hex colors** — Users pick any color; stored as `#RRGGBB`, rendered on card border.
-5. **Pin + color** — Lightweight organization without a separate categories table.
+4. **Custom hex colors** — Users pick any color; stored as `#RRGGBB`, rendered as sticky-note paper.
+5. **Pin + color** — Pin button on card; pinned notes show a pushpin badge and sort first.
 6. **Separate AI log** — `ai_requests` supports rate limiting without storing generated content.
+7. **HTML bodies** — Rich text stored in `body`; AI edge function strips HTML before OpenAI prompts.
 
 ---
 

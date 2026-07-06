@@ -1,6 +1,6 @@
 # Lumenote — Project Plan
 
-> **Status:** Week 3 AI integration in progress — see commit history and [DIAGRAMS.md](./DIAGRAMS.md).
+> **Status:** Week 3 gate features implemented — rich-text editor, AI assistant, tabbed dashboard, sticky notes. Pending: demo video URL in README.
 >
 > **Assignment:** Week 3 AI API & Mini-Project Gate (builds on Week 2 foundation)
 
@@ -15,7 +15,7 @@ A personal notes app where authenticated users capture, organize, and manage pri
 | | |
 |---|---|
 | **Problem** | Students and learners need a simple, private place to jot notes without clutter or account friction. |
-| **Solution** | Lumenote — lightweight notes with secure auth, full CRUD, pin, and color labels. |
+| **Solution** | Lumenote — lightweight notes with secure auth, full CRUD, pin, color labels, rich-text editing, and AI study tools. |
 | **Comparable to** | [PolyVote](https://github.com/djaramil/PolyVote) and [ShouldWeGo](https://github.com/djaramil/ShouldWeGo) — plan → diagrams → incremental commits |
 
 ---
@@ -38,14 +38,14 @@ Following the [ShouldWeGo](https://github.com/djaramil/ShouldWeGo) pattern: **pl
 
 | # | Deliverable | Status |
 |---|-------------|--------|
-| W1 | Two meaningful AI features on user data | In progress |
-| W2 | Supabase Edge Function (server-side OpenAI key) | In progress |
-| W3 | AI error handling, loading states, rate limits | In progress |
-| W4 | API / endpoint documentation + test cases | In progress |
-| W5 | Cost analysis document | In progress |
-| W6 | Updated diagrams (flows, sequences, ERD) | In progress |
-| W7 | README with live URL + demo video link | Pending |
-| W8 | Clean incremental commit history on `main` | In progress |
+| W1 | Two meaningful AI features on user data | ✅ Done |
+| W2 | Supabase Edge Function (server-side OpenAI key) | ✅ Done |
+| W3 | AI error handling, loading states, rate limits | ✅ Done |
+| W4 | API / endpoint documentation + test cases | ✅ Done (Postman) |
+| W5 | Cost analysis document | ✅ Done |
+| W6 | Updated diagrams (flows, sequences, ERD) | ✅ Done |
+| W7 | README with live URL + demo video link | Pending video |
+| W8 | Clean incremental commit history on `main` | ✅ Done |
 
 ### AI features (Week 3)
 
@@ -73,10 +73,11 @@ Track in [ISSUES.md](./ISSUES.md) — do **not** build until MVP is done:
 
 - Search / filter
 - Tags or folders
-- Markdown preview
 - Google OAuth
 - Real-time sync
 - Export (PDF / Markdown)
+
+**Shipped after MVP (not in original backlog):** rich-text editor, image uploads, sticky-note UI, tab navigation.
 
 ---
 
@@ -132,7 +133,7 @@ erDiagram
 | `id` | UUID | PK | Auto-generated |
 | `user_id` | UUID | FK → auth.users | CASCADE delete |
 | `title` | text | 1–120 chars | Required |
-| `body` | text | ≤ 10,000 chars | Optional |
+| `body` | text | ≤ 20,000 chars plain text; HTML stored ≤ 100,000 chars | Rich-text (TipTap); optional images |
 | `color` | text | hex `#RRGGBB` | User-chosen via swatches or color picker |
 | `pinned` | boolean | default false | Sort pinned first |
 | `created_at` | timestamptz | auto | |
@@ -158,10 +159,12 @@ Full schema docs: [docs/DATABASE.md](./docs/DATABASE.md)
 
 | Screen | Route | Purpose |
 |--------|-------|---------|
-| Landing | `/` | Hero, features, CTA |
+| Landing | `/` | Hero, features, CTA (redirects to dashboard if logged in) |
 | Login | `/login` | Email + password |
 | Register | `/register` | Sign up + confirm password |
-| Dashboard | `/dashboard` | Note form + grid (protected) |
+| My Notes | `/dashboard` | Sticky note grid, AI assistant, empty-state illustration (protected) |
+| New Note | `/notes/new` | Rich-text editor + color picker (protected) |
+| Edit Note | `/notes/:id/edit` | Edit existing note (protected) |
 
 Wireframes and visual specs: **[DESIGN.md](./DESIGN.md)**
 
@@ -186,17 +189,19 @@ Detailed steps: [BUILD_STEPS.md](./BUILD_STEPS.md)
 
 ---
 
-## 10. Design Decisions (locked v0.2)
+## 10. Design Decisions (locked v0.3)
 
 | # | Question | Decision |
 |---|----------|----------|
-| D1 | Dashboard layout | ✅ **Form on top + card grid below** |
-| D2 | Note card density | ✅ **Card grid** (`auto-fill`, min 260px) |
+| D1 | Dashboard layout | ✅ **My Notes tab + separate New Note tab** (not inline form) |
+| D2 | Note card density | ✅ **Sticky-note card grid** with color paper + slight tilt |
 | D3 | Note colors | ✅ **Custom hex** + preset swatches |
 | D4 | Accent color | ✅ **Teal** `#2dd4bf` |
-| D5 | Pin UX | ✅ **Pin button on card** |
-| D6 | Empty dashboard | ✅ **Illustration + CTA copy** |
+| D5 | Pin UX | ✅ **Pin button on card** + red pushpin badge when pinned |
+| D6 | Empty dashboard | ✅ **Illustration + CTA** linking to New Note tab |
 | D7 | Auth confirm email | ✅ **Disabled for dev** |
+| D8 | Note body | ✅ **TipTap rich text** — headings, lists, fonts, images |
+| D9 | Logo when logged in | ✅ **Links to `/dashboard`**, not marketing home |
 
 > Logged in [DESIGN_LOG.md](./DESIGN_LOG.md) v0.2. Visual reference: [mockup.html](./mockup.html).
 
@@ -204,15 +209,15 @@ Detailed steps: [BUILD_STEPS.md](./BUILD_STEPS.md)
 
 ## 11. Success Criteria (Week 3 Gate)
 
-- [ ] GitHub Classroom repo with meaningful incremental commits
-- [ ] Two AI features functional and add real value
-- [ ] Supabase CRUD + auth still working end-to-end
-- [ ] AI error handling, loading states, rate limit messages
-- [ ] API documentation and test cases ([docs/API_TESTS.md](./docs/API_TESTS.md))
-- [ ] Cost analysis ([docs/COST_ANALYSIS.md](./docs/COST_ANALYSIS.md))
-- [ ] Diagrams updated for AI flows ([DIAGRAMS.md](./DIAGRAMS.md))
+- [x] GitHub Classroom repo with meaningful incremental commits
+- [x] Two AI features functional and add real value
+- [x] Supabase CRUD + auth still working end-to-end
+- [x] AI error handling, loading states, rate limit messages
+- [x] API documentation and test cases ([docs/API_TESTS.md](./docs/API_TESTS.md))
+- [x] Cost analysis ([docs/COST_ANALYSIS.md](./docs/COST_ANALYSIS.md))
+- [x] Diagrams updated for AI flows ([DIAGRAMS.md](./DIAGRAMS.md))
 - [ ] README with name, Z-number, FAU email, live URL, demo video
-- [ ] Demo video (3–5 min): auth → CRUD → both AI features
+- [ ] Demo video (3–5 min): auth → CRUD → both AI features → rich editor
 
 ---
 
@@ -232,6 +237,6 @@ Detailed steps: [BUILD_STEPS.md](./BUILD_STEPS.md)
 
 ## 13. Next Step
 
-1. Land Week 3 commits in order (see §3 planned commit order).
-2. Deploy `ai-notes` Edge Function + set `OPENAI_API_KEY` in Supabase secrets.
-3. Redeploy Netlify, record 3–5 min demo video, update README placeholders.
+1. Record 3–5 min demo video (auth → My Notes → New Note rich editor → AI features).
+2. Replace demo video placeholder in README.
+3. Optional: run `003_increase_note_body_limit.sql` in Supabase if not already applied.

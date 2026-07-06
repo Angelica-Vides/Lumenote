@@ -50,8 +50,8 @@ flowchart TD
     E --> F[Authenticated session]
     D -- No --> C
     B -- Yes --> F
-    F --> G[Open Dashboard]
-    G --> H[Create note]
+    F --> G[Open My Notes tab]
+    G --> H[New Note tab — create note]
     G --> I[Edit / pin note]
     G --> J[Delete note]
     G --> L[Run AI summary or suggestions]
@@ -67,22 +67,41 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    START([User on Dashboard]) --> ACTION{Action?}
-    ACTION -->|Create| VAL1[Validate title/body/color]
+    START([User on My Notes tab]) --> ACTION{Action?}
+    ACTION -->|Create| NAV[Go to New Note tab]
+    NAV --> VAL1[Validate title/body/color]
     VAL1 -->|Invalid| ERR[Show form error]
     VAL1 -->|Valid| INS[INSERT into notes]
-    INS --> REFRESH[Update local state]
+    INS --> BACK[Return to My Notes tab]
+    BACK --> REFRESH[Update local state]
     ACTION -->|Read| SEL[SELECT notes WHERE user_id = auth.uid]
     SEL --> REFRESH
-    ACTION -->|Update| VAL2[Validate changes]
+    ACTION -->|Update| EDIT[Go to Edit note page]
+    EDIT --> VAL2[Validate changes]
     VAL2 --> UPD[UPDATE note by id]
-    UPD --> REFRESH
+    UPD --> BACK
     ACTION -->|Delete| CONF{Confirm?}
     CONF -- No --> START
     CONF -- Yes --> DEL[DELETE note by id]
     DEL --> REFRESH
     REFRESH --> START
     ERR --> START
+```
+
+Note bodies may contain **HTML** from the TipTap rich-text editor (headings, lists, images). AI prompts strip HTML to plain text before calling OpenAI.
+
+### 1c-b. Rich Text & Image Upload
+
+```mermaid
+flowchart TD
+    START([User on New Note tab]) --> EDIT[TipTap editor: bold, lists, fonts, images]
+    EDIT --> IMG{Upload image?}
+    IMG -- Yes --> UP[uploadNoteImage → Supabase Storage note-images bucket]
+    UP --> URL[Public image URL inserted in HTML body]
+    IMG -- No --> SAVE[Save note]
+    URL --> SAVE
+    SAVE --> DB[(notes.body stores HTML up to 100k chars)]
+    DB --> CARD[Sticky note card preview with sanitized HTML]
 ```
 
 ### 1d. Summarize Pipeline (AI #1)
@@ -141,16 +160,17 @@ stateDiagram-v2
     Authenticated --> [*]
 ```
 
-### 2b. Dashboard View Mode
+### 2b. App Navigation (Logged-in Tabs)
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ListView
-    ListView --> CreateMode: focus new note form
-    ListView --> EditMode: click Edit on card
-    EditMode --> ListView: save or cancel
-    CreateMode --> ListView: note created
-    ListView --> ListView: pin / delete / refresh
+    [*] --> MyNotes: login / logo click
+    MyNotes --> NewNote: New Note tab or empty-state CTA
+    NewNote --> MyNotes: save note or cancel
+    MyNotes --> EditNote: Edit on sticky note card
+    EditNote --> MyNotes: save or cancel
+    MyNotes --> MyNotes: pin / delete / AI assistant
+    Anonymous --> MyNotes: redirect from / when logged in
 ```
 
 ### 2c. AI Assistant (UI + API)
@@ -219,6 +239,7 @@ flowchart TB
     subgraph SupabaseCloud["Supabase Cloud"]
         SAUTH[Auth service]
         PG[(PostgreSQL + RLS)]
+        STOR[Storage: note-images]
         FN[Edge Function<br/>ai-notes]
     end
 
@@ -230,9 +251,11 @@ flowchart TB
     BROWSER -->|HTTPS| SPA
     BROWSER -->|JWT + CRUD| SAUTH
     BROWSER -->|JWT + CRUD| PG
+    BROWSER -->|JWT + image upload| STOR
     BROWSER -->|JWT + AI action| FN
     FN -->|read notes + ai_requests| PG
     FN -->|OPENAI_API_KEY secret| OAI
+    STOR --> PG
     SAUTH --> PG
 ```
 
@@ -245,25 +268,28 @@ flowchart TB
 ```mermaid
 sequenceDiagram
     actor U as User
-    participant UI as Dashboard
+    participant UI as NoteEditorPage
+    participant RTE as RichTextEditor
     participant VAL as validation.js
     participant API as notes.js
     participant SB as Supabase
     participant DB as PostgreSQL
 
-    U->>UI: fill form + click Save
+    U->>UI: New Note tab — fill title + rich body + color
+    UI->>RTE: format text / upload image
+    U->>UI: click Save note
     UI->>VAL: validateNote(input)
     alt invalid
         VAL-->>UI: error message
-        UI-->>U: show form error
+        UI-->>U: show form error + character counter
     else valid
         VAL-->>API: proceed
-        API->>SB: insert({ user_id, title, body, color })
+        API->>SB: insert({ user_id, title, body HTML, color })
         SB->>DB: INSERT (RLS checks auth.uid() = user_id)
         DB-->>SB: new row
         SB-->>API: created note
         API-->>UI: note object
-        UI-->>U: note appears in grid
+        UI-->>U: redirect to My Notes — sticky note in grid
     end
 ```
 
@@ -331,20 +357,25 @@ sequenceDiagram
 flowchart TD
     APP[App] --> AUTHP[AuthProvider]
     AUTHP --> RT[BrowserRouter]
-    RT --> LAYOUT[Layout]
-    LAYOUT --> NAV[Header / Nav]
+    RT --> LAYOUT[Layout + NotesTabs]
+    LAYOUT --> NAV[Header / Logo / Sign out]
     RT --> ROUTES[Routes]
 
-    ROUTES --> HOME[Home]
+    ROUTES --> HOME[Home → redirect if logged in]
     ROUTES --> LOGIN[Login]
     ROUTES --> REGISTER[Register]
     ROUTES --> PROTECT[ProtectedRoute]
-    PROTECT --> DASH[Dashboard]
+    PROTECT --> DASH[Dashboard — My Notes tab]
+    PROTECT --> NEW[NoteEditorPage /notes/new]
+    PROTECT --> EDIT[NoteEditorPage /notes/:id/edit]
 
-    DASH --> FORM[NoteForm]
     DASH --> AI[AiAssistant]
     DASH --> LIST[NoteList]
-    LIST --> CARD[NoteCard]
+    LIST --> CARD[NoteCard sticky notes]
+    LIST --> EMPTY[EmptyState illustration]
+    NEW --> FORM[NoteForm + RichTextEditor]
+    EDIT --> FORM
+    FORM --> STOR[lib/noteImages.js → Storage]
     AI --> AILIB[lib/ai.js]
     AILIB --> FN[Supabase Edge Function]
 ```

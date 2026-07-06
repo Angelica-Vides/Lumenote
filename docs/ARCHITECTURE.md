@@ -13,10 +13,13 @@ How the frontend, backend (BaaS), and database fit together.
 │  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐  │
 │  │  Pages   │  │Components│  │  lib/ (data access)  │  │
 │  │ Home     │  │ Layout   │  │  supabase.js         │  │
-│  │ Login    │  │ NoteForm │  │  notes.js            │  │
-│  │ Register │  │ NoteList │  │  validation.js       │  │
-│  │ Dashboard│  │ NoteCard │  └──────────┬───────────┘  │
-│  └──────────┘  └──────────┘             │              │
+│  │ Login    │  │ NotesTabs│  │  notes.js            │  │
+│  │ Register │  │ NoteForm │  │  noteBody.js         │  │
+│  │ Dashboard│  │ RichText │  │  noteImages.js       │  │
+│  │ NoteEdit │  │ NoteList │  │  ai.js               │  │
+│  └──────────┘  │ NoteCard │  │  validation.js       │  │
+│                │ AiAssist │  └──────────┬───────────┘  │
+│                └──────────┘             │              │
 └─────────────────────────────────────────┼──────────────┘
                                             │ HTTPS + JWT
                                             ▼
@@ -25,9 +28,12 @@ How the frontend, backend (BaaS), and database fit together.
 │  ┌─────────────┐  ┌──────────────┐  ┌───────────────┐  │
 │  │ Auth        │  │ PostgREST    │  │ PostgreSQL    │  │
 │  │ email/pwd   │  │ REST API     │  │ notes table   │  │
-│  │ bcrypt hash │  │ auto from    │  │ RLS policies  │  │
-│  │ JWT sessions│  │ schema       │  │ triggers      │  │
+│  │ bcrypt hash │  │ auto from    │  │ ai_requests   │  │
+│  │ JWT sessions│  │ schema       │  │ Storage bucket│  │
 │  └─────────────┘  └──────────────┘  └───────────────┘  │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │ Edge Function: ai-notes (OpenAI, rate limits)     │  │
+│  └──────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -39,7 +45,8 @@ How the frontend, backend (BaaS), and database fit together.
 |-------|----------|----------------|
 | **Presentation** | `src/pages/`, `src/components/` | UI, forms, routing, user feedback |
 | **State** | `src/context/AuthContext.jsx` | Auth session, sign up/in/out |
-| **Data access** | `src/lib/notes.js` | CRUD calls, error mapping |
+| **Data access** | `src/lib/notes.js`, `src/lib/noteImages.js` | CRUD calls, image uploads, error mapping |
+| **Rich text** | `src/components/RichTextEditor.jsx`, `src/lib/noteBody.js` | TipTap editor, HTML sanitize/strip |
 | **AI access** | `src/lib/ai.js`, `supabase/functions/ai-notes` | Authenticated AI summaries and suggestions |
 | **Validation** | `src/lib/validation.js` | Client-side input checks before API |
 | **Client config** | `src/lib/supabase.js` | Supabase client singleton |
@@ -50,12 +57,12 @@ How the frontend, backend (BaaS), and database fit together.
 
 ## Request Flow (Example: Create Note)
 
-1. User submits `NoteForm` on Dashboard.
-2. `validation.js` checks title length, body length, color enum.
-3. `notes.js` calls `supabase.from('notes').insert({...})`.
+1. User submits `NoteForm` on the **New Note** or **Edit Note** page.
+2. `RichTextEditor` produces HTML; `validation.js` checks title length, plain-text body (≤ 20,000 chars), and color.
+3. `notes.js` calls `supabase.from('notes').insert({...})` or `.update(...)`.
 4. Supabase client attaches JWT from auth session.
-5. PostgREST runs INSERT; PostgreSQL RLS verifies `auth.uid() = user_id`.
-6. New row returned to client; Dashboard updates local state.
+5. PostgREST runs INSERT/UPDATE; PostgreSQL RLS verifies `auth.uid() = user_id`.
+6. User is redirected to **My Notes**; dashboard updates the sticky-note grid.
 
 ## Request Flow (Example: AI Summary)
 
@@ -87,9 +94,9 @@ How the frontend, backend (BaaS), and database fit together.
 | Environment | Host | Trigger |
 |-------------|------|---------|
 | Local dev | `npm run dev` (localhost:5173) | Manual |
-| Production | GitHub Pages | Push to `main` via GitHub Actions |
+| Production | Netlify (`lumenote-angelica-vides.netlify.app`) | Manual CLI deploy of `dist` |
 
-Build injects `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `VITE_BASE_PATH` from GitHub Secrets / workflow env. Supabase stores `OPENAI_API_KEY` and optional `OPENAI_MODEL` as Edge Function secrets.
+Build uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from `.env`. Supabase stores `OPENAI_API_KEY` and optional `OPENAI_MODEL` as Edge Function secrets. Image uploads use the `note-images` Storage bucket (see migration `002_note_images_storage.sql`).
 
 ---
 
