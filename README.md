@@ -6,14 +6,14 @@ Built for the **Week 3 AI API & Mini-Project Gate**: AI integration, Supabase ba
 
 **Student:** Angelica Vides  
 **Z-number:** Z23515404  
-**FAU email:** avides2019@fau.edu
+**FAU email:** [avides2019@fau.edu](mailto:avides2019@fau.edu)
 
 > **Live URL:**
 >
 >  [https://lumenote-angelica-vides.netlify.app](https://lumenote-angelica-vides.netlify.app/)
 
-> **Demo Video URL:** TODO: replace with the Week 3 3-5 minute demo video after recording  
-> [https://youtu.be/LH4xtiiTwuk](https://youtu.be/LH4xtiiTwuk)
+> **Demo Video URL:**   
+> [https://youtu.be/Ee1AbX8gLII](https://youtu.be/Ee1AbX8gLII)
 >
 > **Note:** This is the **Lumenote** app (Week 3). It is an updated version of the week 2 app. Local folder: `lumenote/`.
 
