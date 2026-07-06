@@ -97,7 +97,7 @@ export default function Dashboard() {
       )}
 
       {loading ? (
-        <div className="dashboard__loading" role="status" aria-live="polite">
+        <div className="dashboard__loading notes-board" role="status" aria-live="polite">
           <span className="visually-hidden">Loading notes…</span>
           <NoteListSkeleton />
         </div>

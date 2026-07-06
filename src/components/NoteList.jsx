@@ -18,7 +18,7 @@ export default function NoteList({ notes, onEdit, onDelete, onTogglePin, pending
   });
 
   return (
-    <div className="note-list">
+    <div className="note-list notes-board">
       {pinned.length > 0 && (
         <section>
           <h3 className="note-list__heading">Pinned ({pinned.length})</h3>
