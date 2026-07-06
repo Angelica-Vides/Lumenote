@@ -17,8 +17,9 @@ How the frontend, backend (BaaS), and database fit together.
 │  │ Register │  │ NoteForm │  │  noteBody.js         │  │
 │  │ Dashboard│  │ RichText │  │  noteImages.js       │  │
 │  │ NoteEdit │  │ NoteList │  │  ai.js               │  │
-│  └──────────┘  │ NoteCard │  │  validation.js       │  │
-│                │ AiAssist │  └──────────┬───────────┘  │
+│  │ NoteView │  │ NoteCard │  │  validation.js       │  │
+│  └──────────┘  │ AiAssist │  └──────────┬───────────┘  │
+│                │ PinBadge │             │              │
 │                └──────────┘             │              │
 └─────────────────────────────────────────┼──────────────┘
                                             │ HTTPS + JWT
@@ -63,6 +64,16 @@ How the frontend, backend (BaaS), and database fit together.
 4. Supabase client attaches JWT from auth session.
 5. PostgREST runs INSERT/UPDATE; PostgreSQL RLS verifies `auth.uid() = user_id`.
 6. User is redirected to **My Notes**; dashboard updates the sticky-note grid.
+
+## Request Flow (Example: View Full Note)
+
+1. User clicks **View full note** on a sticky note card in **My Notes**.
+2. React Router navigates to `/notes/:id` (`NoteViewPage`).
+3. `ProtectedRoute` ensures the user is authenticated.
+4. `notes.js` fetches the note by ID; RLS returns the row only if `auth.uid() = user_id`.
+5. `noteBody.js` sanitizes HTML for safe read-only rendering.
+6. Images in the body display centered with a white mat frame on the note's paper color.
+7. User can **Back to My Notes**, **Edit**, **Pin**, or **Delete** from the view page header.
 
 ## Request Flow (Example: AI Summary)
 

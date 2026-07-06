@@ -2,7 +2,7 @@
 
 Living design doc. Update this file and `mockup.html` as you iterate. Log changes in [DESIGN_LOG.md](./DESIGN_LOG.md).
 
-**Design status:** v0.3 — tabbed dashboard, sticky notes, rich-text editor (see [PLAN.md §10](./PLAN.md#10-design-decisions-locked-v03))
+**Design status:** v0.4 — tabbed dashboard, sticky notes, rich-text editor, full note view page (see [PLAN.md §10](./PLAN.md#10-design-decisions-locked-v04))
 
 ---
 
@@ -46,7 +46,7 @@ Notes store a **hex color** (e.g. `#3b82f6`) in the database. The UI provides:
 1. **Preset swatches** — quick picks (teal, blue, green, violet, rose, amber)
 2. **Custom picker** — native `<input type="color">` for any hex value
 
-Card background uses the note's stored **hex color** as sticky-note paper. Pinned notes show a **red pushpin** at the top-right corner.
+Card background uses the note's stored **hex color** as sticky-note paper. Pinned notes show a **red pushpin** at the top-right corner. Embedded images in cards and on the view page use a **centered white mat frame** for contrast on colored paper.
 
 ### Typography
 
@@ -102,6 +102,7 @@ Tab bar: **My Notes | New Note**. Notes appear as a **sticky-note grid** (pinned
 │    │ sticky   │ │ sticky   │   ← colored paper + tilt      │
 │    │ note     │ │ note     │                               │
 │    │ Pin Edit Delete          │                               │
+│    │ View full note →         │                               │
 │    └──────────┘ └──────────┘                               │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -123,6 +124,26 @@ When user has zero notes on **My Notes**:
 └─────────────────────────────────────────────────────────────┘
 ```
 
+### 3e. View Note `/notes/:id` ✅
+
+Read-only full sticky note — same paper color as the card, wider layout for long content and images. **Back to My Notes**, **Edit**, **Pin**, and **Delete** actions in the header.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  [Logo] Lumenote                         user@  Sign out   │
+│  [ My Notes ]  [ New Note ]                                 │
+├─────────────────────────────────────────────────────────────┤
+│  ← Back to My Notes          Pin  Edit  Delete              │
+│  📌┌─────────────────────────────────────────────────────┐  │
+│    │ NOTE TITLE (sticky paper color)                     │  │
+│    │ formatted body — headings, lists, fonts             │  │
+│    │ ┌─────────────────┐                               │  │
+│    │ │  centered image │  ← white mat frame              │  │
+│    │ └─────────────────┘                               │  │
+│    └─────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ---
 
 ## 4. Component Inventory
@@ -136,7 +157,9 @@ When user has zero notes on **My Notes**:
 | `NoteForm` | New / Edit note pages | Title, color, wraps RichTextEditor |
 | `RichTextEditor` | NoteForm | TipTap toolbar + character counter |
 | `NoteList` | Dashboard | Pinned + all notes sections |
-| `NoteCard` | Dashboard | Sticky-note style; pin badge when pinned |
+| `NoteCard` | Dashboard | Sticky-note style; pin badge when pinned; **View full note** link |
+| `NoteViewPage` | View note | Read-only full note; centered images; pin/edit/delete |
+| `PinBadge` | NoteCard, NoteViewPage | Red pushpin when note is pinned |
 | `EmptyState` | Dashboard | SVG illustration + link to New Note |
 | `AiAssistant` | Dashboard | Summarize + suggest AI features |
 | `ProtectedRoute` | Router | Redirect if anonymous |
@@ -149,7 +172,8 @@ When user has zero notes on **My Notes**:
 |-------------|----------|
 | **Create note** | New Note tab → save → redirect to My Notes grid |
 | **Custom color** | Pick swatch OR use color input → sticky-note paper color |
-| **Edit note** | Edit on card → `/notes/:id/edit` page |
+| **View full note** | View full note on card → `/notes/:id` read-only page |
+| **Edit note** | Edit on card or view page → `/notes/:id/edit` |
 | **Delete note** | Delete → confirm dialog |
 | **Pin note** | Pin button on card → pushpin badge; pinned section sorts first |
 | **Rich text** | TipTap toolbar; list style dropdowns; image upload to Storage |
@@ -176,6 +200,8 @@ When user has zero notes on **My Notes**:
 - [x] Rich-text editor with character counter
 - [x] Pin: button + corner pushpin badge
 - [x] Empty state: illustration
+- [x] Full note view page (not inline card expand)
+- [x] Centered image frames on sticky notes
 - [x] Email confirm: off for dev
 - [x] Final review of mockup in browser
 - [x] Sign-off → BUILD_STEPS Step 1

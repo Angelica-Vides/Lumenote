@@ -1,6 +1,6 @@
 # Lumenote — Project Plan
 
-> **Status:** Week 3 gate features implemented — rich-text editor, AI assistant, tabbed dashboard, sticky notes. Pending: demo video URL in README.
+> **Status:** Week 3 gate features implemented — rich-text editor, AI assistant, tabbed dashboard, sticky notes, full note view page. Pending: demo video URL in README.
 >
 > **Assignment:** Week 3 AI API & Mini-Project Gate (builds on Week 2 foundation)
 
@@ -77,7 +77,7 @@ Track in [ISSUES.md](./ISSUES.md) — do **not** build until MVP is done:
 - Real-time sync
 - Export (PDF / Markdown)
 
-**Shipped after MVP (not in original backlog):** rich-text editor, image uploads, sticky-note UI, tab navigation.
+**Shipped after MVP (not in original backlog):** rich-text editor, image uploads, sticky-note UI, tab navigation, full note view page, centered image frames on sticky notes.
 
 ---
 
@@ -150,7 +150,7 @@ Full schema docs: [docs/DATABASE.md](./docs/DATABASE.md)
 | Landing page | No | Public route |
 | Register / login | No | Public routes |
 | Dashboard | Yes | ProtectedRoute + RLS |
-| Create / edit / delete note | Yes | Auth + RLS |
+| Create / edit / delete / view note | Yes | Auth + RLS |
 | Read notes | Yes | RLS `auth.uid() = user_id` |
 
 ---
@@ -162,8 +162,9 @@ Full schema docs: [docs/DATABASE.md](./docs/DATABASE.md)
 | Landing | `/` | Hero, features, CTA (redirects to dashboard if logged in) |
 | Login | `/login` | Email + password |
 | Register | `/register` | Sign up + confirm password |
-| My Notes | `/dashboard` | Sticky note grid, AI assistant, empty-state illustration (protected) |
+| My Notes | `/dashboard` | Sticky note grid (short preview), AI assistant, empty-state illustration (protected) |
 | New Note | `/notes/new` | Rich-text editor + color picker (protected) |
+| View Note | `/notes/:id` | Read-only full sticky note — formatted body, centered images (protected) |
 | Edit Note | `/notes/:id/edit` | Edit existing note (protected) |
 
 Wireframes and visual specs: **[DESIGN.md](./DESIGN.md)**
@@ -189,7 +190,7 @@ Detailed steps: [BUILD_STEPS.md](./BUILD_STEPS.md)
 
 ---
 
-## 10. Design Decisions (locked v0.3)
+## 10. Design Decisions (locked v0.4)
 
 | # | Question | Decision |
 |---|----------|----------|
@@ -202,6 +203,8 @@ Detailed steps: [BUILD_STEPS.md](./BUILD_STEPS.md)
 | D7 | Auth confirm email | ✅ **Disabled for dev** |
 | D8 | Note body | ✅ **TipTap rich text** — headings, lists, fonts, images |
 | D9 | Logo when logged in | ✅ **Links to `/dashboard`**, not marketing home |
+| D10 | Read full note | ✅ **Dedicated view page** (`/notes/:id`) — not inline card expand |
+| D11 | Images on sticky notes | ✅ **Centered** with white mat frame for contrast on colored paper |
 
 > Logged in [DESIGN_LOG.md](./DESIGN_LOG.md) v0.2. Visual reference: [mockup.html](./mockup.html).
 
@@ -217,7 +220,7 @@ Detailed steps: [BUILD_STEPS.md](./BUILD_STEPS.md)
 - [x] Cost analysis ([docs/COST_ANALYSIS.md](./docs/COST_ANALYSIS.md))
 - [x] Diagrams updated for AI flows ([DIAGRAMS.md](./DIAGRAMS.md))
 - [ ] README with name, Z-number, FAU email, live URL, demo video
-- [ ] Demo video (3–5 min): auth → CRUD → both AI features → rich editor
+- [ ] Demo video (3–5 min): auth → CRUD → rich editor → view full note → both AI features
 
 ---
 
@@ -237,6 +240,6 @@ Detailed steps: [BUILD_STEPS.md](./BUILD_STEPS.md)
 
 ## 13. Next Step
 
-1. Record 3–5 min demo video (auth → My Notes → New Note rich editor → AI features).
+1. Record 3–5 min demo video (auth → My Notes → New Note → View full note → AI features).
 2. Replace demo video placeholder in README.
 3. Optional: run `003_increase_note_body_limit.sql` in Supabase if not already applied.

@@ -54,7 +54,9 @@ flowchart TD
     G --> H[New Note tab — create note]
     G --> I[Edit / pin note]
     G --> J[Delete note]
+    G --> M[View full note]
     G --> L[Run AI summary or suggestions]
+    M --> G
     H --> G
     I --> G
     J --> G
@@ -167,7 +169,9 @@ stateDiagram-v2
     [*] --> MyNotes: login / logo click
     MyNotes --> NewNote: New Note tab or empty-state CTA
     NewNote --> MyNotes: save note or cancel
-    MyNotes --> EditNote: Edit on sticky note card
+    MyNotes --> ViewNote: View full note on card
+    ViewNote --> MyNotes: Back to My Notes
+    ViewNote --> EditNote: Edit button
     EditNote --> MyNotes: save or cancel
     MyNotes --> MyNotes: pin / delete / AI assistant
     Anonymous --> MyNotes: redirect from / when logged in
@@ -295,6 +299,37 @@ sequenceDiagram
 
 ---
 
+## 5b. Sequence Diagram — View Full Note
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant CARD as NoteCard
+    participant RT as React Router
+    participant VIEW as NoteViewPage
+    participant API as notes.js
+    participant SB as Supabase
+    participant DB as PostgreSQL
+
+    U->>CARD: click View full note
+    CARD->>RT: navigate /notes/:id
+    RT->>VIEW: render NoteViewPage
+    VIEW->>API: getNoteById(id)
+    API->>SB: select from notes where id = :id
+    SB->>DB: SELECT (RLS checks auth.uid() = user_id)
+    alt not found / forbidden
+        DB-->>VIEW: empty
+        VIEW-->>U: redirect or error state
+    else found
+        DB-->>SB: note row (HTML body)
+        SB-->>VIEW: note object
+        VIEW->>VIEW: sanitize HTML, apply sticky paper + image frames
+        VIEW-->>U: read-only full note with actions
+    end
+```
+
+---
+
 ## 6. Sequence Diagram — AI Summarize (AI #1)
 
 ```mermaid
@@ -368,11 +403,15 @@ flowchart TD
     PROTECT --> DASH[Dashboard — My Notes tab]
     PROTECT --> NEW[NoteEditorPage /notes/new]
     PROTECT --> EDIT[NoteEditorPage /notes/:id/edit]
+    PROTECT --> VIEWPAGE[NoteViewPage /notes/:id]
 
     DASH --> AI[AiAssistant]
     DASH --> LIST[NoteList]
     LIST --> CARD[NoteCard sticky notes]
     LIST --> EMPTY[EmptyState illustration]
+    CARD --> VIEW[View full note link]
+    VIEW --> VIEWPAGE
+    VIEWPAGE --> PIN[PinBadge]
     NEW --> FORM[NoteForm + RichTextEditor]
     EDIT --> FORM
     FORM --> STOR[lib/noteImages.js → Storage]
