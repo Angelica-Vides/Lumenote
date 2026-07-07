@@ -38,12 +38,20 @@ Built for the **Week 3 AI API & Mini-Project Gate**: AI integration, Supabase ba
 - **Authentication** — Sign up, log in, log out with persistent sessions (Supabase Auth)
 - **Private notes** — Row Level Security ensures users only see their own data
 - **CRUD** — Create, read, update, and delete notes with validation
+- **Rich-text editor** — TipTap toolbar with headings, list styles, fonts, and image uploads (compressed before upload)
 - **Pin notes** — Important notes stay at the top
-- **Color labels** — Visual organization (default, blue, green, amber, rose)
-- **AI summaries** — Summarize the authenticated user’s saved notes into an overview, key points, and follow-ups
-- **AI suggestions** — Generate personalized study notes/tasks from the user’s existing note content
+- **Color labels** — Visual organization via preset swatches or custom hex picker
+- **Search & sort** — Filter My Notes by title/body; sort by date or title
+- **Duplicate notes** — One-click copy from a card or the full note view
+- **AI summaries** — Summarize selected notes into an overview, key points, and follow-ups
+- **AI suggestions** — Generate personalized study ideas; create a new note from any suggestion
+- **AI from anywhere** — Run AI on one note from its card, or from the full note view page
+- **Unsaved-changes guard** — Warns before leaving the editor with unsaved edits
+- **Save feedback** — Toast confirmations after save, pin, delete, and duplicate
+- **Light / dark theme** — Toggle in the header; preference saved in local storage
+- **Mobile-friendly editor** — Collapsible “More formatting” toolbar on small screens
 - **AI safety UX** — Loading states, API failure messages, and hourly rate-limit handling through Supabase
-- **CI/CD** — Automatic deploy to GitHub Pages on push to `main`
+- **CI/CD** — GitHub Actions workflow for automated deploy (Netlify manual CLI recommended for live site)
 
 ---
 
@@ -216,14 +224,28 @@ Click **Pin** on a card — it moves to the **Pinned** section at the top.
 
 ### Delete a note
 
-Click **Delete** → confirm — note is removed from the database.
+Click **Delete** on a card or the view page → confirm in the styled dialog — note is removed from the database.
+
+### Search and sort
+
+On **My Notes**, use the search box to filter by title or body text. Use the **Sort** dropdown for newest/oldest or A–Z / Z–A.
+
+### Duplicate a note
+
+Click **Duplicate** on a card or the view page — a copy is created with “(copy)” appended to the title.
 
 ### Use AI study tools
 
 1. Create at least one note
-2. Click **Summarize notes** to generate an overview, key points, and follow-up actions
-3. Click **Suggest study notes** to generate personalized next-note ideas from saved content
-4. If the API is unavailable or rate limited, Lumenote shows a friendly inline error
+2. On the dashboard, select which sticky notes to include (or use **AI summary** / **AI ideas** on a single card)
+3. Click **Summarize notes** or **Suggest study notes**
+4. From suggestions, click **Create note** to turn an idea into a new sticky note
+5. On a full note view page, the compact AI panel runs against that note only
+6. If the API is unavailable or rate limited, Lumenote shows a friendly inline error
+
+### Theme
+
+Click **☀ Light** or **☾ Dark** in the header to switch themes. Your choice is remembered on this device.
 
 
 
@@ -360,10 +382,10 @@ Record on your **Netlify live URL** (best) or `http://localhost:5173`.
 │   ├── lumenote-api.postman_collection.json
 │   └── lumenote-api.postman_environment.json
 ├── src/
-│   ├── components/                  # Layout, NoteForm, NoteList, NoteCard
-│   ├── context/AuthContext.jsx      # Auth state
-│   ├── lib/                         # supabase, notes CRUD, validation
-│   └── pages/                       # Home, Login, Register, Dashboard
+│   ├── components/                  # Layout, NoteForm, NoteList, NoteCard, AiAssistant, ConfirmModal
+│   ├── context/                     # AuthContext, ThemeContext, ToastContext
+│   ├── lib/                         # supabase, notes CRUD, AI client, filters, image compression
+│   └── pages/                       # Home, Login, Register, Dashboard, NoteEditor, NoteView
 ├── supabase/
 │   ├── functions/ai-notes/           # Authenticated AI endpoint
 │   └── schema.sql                    # PostgreSQL schema + RLS
@@ -403,8 +425,11 @@ docs: complete assignment documentation
 - [ ] Log out and log back in
 - [ ] Create a note
 - [ ] Edit and pin a note
-- [ ] Generate an AI summary
-- [ ] Generate AI study suggestions
+- [ ] Search or sort notes on My Notes
+- [ ] Duplicate a note
+- [ ] Switch light/dark theme
+- [ ] Generate an AI summary (with note selection)
+- [ ] Generate AI study suggestions and create a note from one
 - [ ] Delete a note
 - [ ] Briefly show live deployed URL
 

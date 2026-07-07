@@ -1,6 +1,6 @@
 # Lumenote — Project Plan
 
-> **Status:** Week 3 gate features implemented — rich-text editor, AI assistant, tabbed dashboard, sticky notes, full note view page. Pending: demo video URL in README.
+> **Status:** Week 3 gate complete — rich-text editor, AI assistant with note selection, UX polish (search/sort, theme, toasts, modals), tabbed dashboard, sticky notes, full note view page. Demo video URL in README.
 >
 > **Assignment:** Week 3 AI API & Mini-Project Gate (builds on Week 2 foundation)
 
@@ -71,13 +71,12 @@ Both features read **only the authenticated user's notes** (via RLS) — not a g
 
 Track in [ISSUES.md](./ISSUES.md) — do **not** build until MVP is done:
 
-- Search / filter
 - Tags or folders
 - Google OAuth
 - Real-time sync
 - Export (PDF / Markdown)
 
-**Shipped after MVP (not in original backlog):** rich-text editor, image uploads, sticky-note UI, tab navigation, full note view page, centered image frames on sticky notes.
+**Shipped after MVP (not in original backlog):** rich-text editor, image uploads (with compression), sticky-note UI, tab navigation, full note view page, centered image frames, search/filter + sort, duplicate note, light/dark theme, save toasts, styled delete/leave modals, unsaved-changes warning, mobile editor toolbar, AI from card/view page, create note from AI suggestion.
 
 ---
 
@@ -205,6 +204,10 @@ Detailed steps: [BUILD_STEPS.md](./BUILD_STEPS.md)
 | D9 | Logo when logged in | ✅ **Links to `/dashboard`**, not marketing home |
 | D10 | Read full note | ✅ **Dedicated view page** (`/notes/:id`) — not inline card expand |
 | D11 | Images on sticky notes | ✅ **Centered** with white mat frame for contrast on colored paper |
+| D12 | My Notes organization | ✅ **Search + sort** toolbar above the grid |
+| D13 | Theme | ✅ **Light / dark toggle** in header (localStorage) |
+| D14 | Destructive actions | ✅ **Styled ConfirmModal** (delete, leave without saving) |
+| D15 | AI scope | ✅ **User selects notes**; per-card and view-page shortcuts |
 
 > Logged in [DESIGN_LOG.md](./DESIGN_LOG.md) v0.2. Visual reference: [mockup.html](./mockup.html).
 

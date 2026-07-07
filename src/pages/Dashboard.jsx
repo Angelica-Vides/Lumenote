@@ -1,23 +1,27 @@
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import AiAssistant from "../components/AiAssistant";
+import ConfirmModal from "../components/ConfirmModal";
 import NoteList from "../components/NoteList";
 import NoteListSkeleton from "../components/NoteListSkeleton";
-import { deleteNote, fetchNotes, updateNote } from "../lib/notes";
-
-function sortNotes(notes) {
-  return [...notes].sort((a, b) => {
-    if (a.pinned !== b.pinned) return Number(b.pinned) - Number(a.pinned);
-    return new Date(b.updated_at) - new Date(a.updated_at);
-  });
-}
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { applyNoteFilters, SORT_OPTIONS } from "../lib/noteFilters";
+import { createNote, deleteNote, duplicateNote, fetchNotes, updateNote } from "../lib/notes";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [pendingNoteId, setPendingNoteId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("updated_desc");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [aiFocus, setAiFocus] = useState(null);
 
   const loadNotes = useCallback(async () => {
     setLoading(true);
@@ -37,6 +41,20 @@ export default function Dashboard() {
     loadNotes();
   }, [loadNotes]);
 
+  useEffect(() => {
+    if (!location.state?.aiNoteIds?.length) return;
+    setAiFocus({
+      noteIds: location.state.aiNoteIds,
+      action: location.state.aiAction || null,
+    });
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate]);
+
+  const visibleNotes = useMemo(
+    () => applyNoteFilters(notes, { query: searchQuery, sortBy }),
+    [notes, searchQuery, sortBy],
+  );
+
   const handleEdit = (note) => {
     navigate(`/notes/${note.id}/edit`);
   };
@@ -45,8 +63,9 @@ export default function Dashboard() {
     setPendingNoteId(note.id);
     try {
       const updated = await updateNote(note.id, { pinned: !note.pinned });
-      setNotes((prev) => sortNotes(prev.map((n) => (n.id === updated.id ? updated : n))));
+      setNotes((prev) => prev.map((n) => (n.id === updated.id ? updated : n)));
       setError("");
+      showToast(updated.pinned ? "Note pinned." : "Note unpinned.");
     } catch (err) {
       setError(err.message || "Could not update note.");
     } finally {
@@ -54,19 +73,48 @@ export default function Dashboard() {
     }
   };
 
-  const handleDelete = async (noteId) => {
-    if (!window.confirm("Delete this note permanently?")) return;
+  const handleDeleteRequest = (noteId) => {
+    const note = notes.find((item) => item.id === noteId);
+    if (!note) return;
+    setDeleteTarget(note);
+  };
 
-    setPendingNoteId(noteId);
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    setPendingNoteId(deleteTarget.id);
     try {
-      await deleteNote(noteId);
-      setNotes((prev) => prev.filter((n) => n.id !== noteId));
+      await deleteNote(deleteTarget.id);
+      setNotes((prev) => prev.filter((n) => n.id !== deleteTarget.id));
       setError("");
+      showToast(`Deleted "${deleteTarget.title}".`);
+      setDeleteTarget(null);
     } catch (err) {
       setError(err.message || "Could not delete note.");
     } finally {
       setPendingNoteId(null);
     }
+  };
+
+  const handleDuplicate = async (note) => {
+    setPendingNoteId(note.id);
+    try {
+      const copy = await duplicateNote(user.id, note);
+      setNotes((prev) => [copy, ...prev]);
+      showToast(`Duplicated "${note.title}".`);
+    } catch (err) {
+      setError(err.message || "Could not duplicate note.");
+    } finally {
+      setPendingNoteId(null);
+    }
+  };
+
+  const handleRunAiForNote = (note, action) => {
+    setAiFocus({ noteIds: [note.id], action });
+    document.getElementById("ai-assistant")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleNoteCreatedFromSuggestion = (note) => {
+    setNotes((prev) => applyNoteFilters([note, ...prev], { query: searchQuery, sortBy }));
   };
 
   return (
@@ -83,7 +131,38 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <AiAssistant notes={notes} />
+      <div id="ai-assistant">
+        <AiAssistant
+          notes={notes}
+          focusSelection={aiFocus}
+          onFocusHandled={() => setAiFocus(null)}
+          onNoteCreated={handleNoteCreatedFromSuggestion}
+        />
+      </div>
+
+      {!loading && notes.length > 0 && (
+        <div className="notes-toolbar card">
+          <label className="notes-toolbar__search">
+            <span className="visually-hidden">Search notes</span>
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search notes by title or body…"
+            />
+          </label>
+          <label className="notes-toolbar__sort">
+            <span>Sort</span>
+            <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+              {SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
 
       {error && (
         <div className="dashboard__error">
@@ -103,13 +182,32 @@ export default function Dashboard() {
         </div>
       ) : (
         <NoteList
-          notes={notes}
+          notes={visibleNotes}
+          totalCount={notes.length}
+          searchQuery={searchQuery}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={handleDeleteRequest}
           onTogglePin={handleTogglePin}
+          onDuplicate={handleDuplicate}
+          onRunAi={handleRunAiForNote}
           pendingNoteId={pendingNoteId}
         />
       )}
+
+      <ConfirmModal
+        open={Boolean(deleteTarget)}
+        title="Delete note?"
+        message={
+          deleteTarget
+            ? `Delete "${deleteTarget.title}" permanently? This cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete note"
+        danger
+        busy={Boolean(pendingNoteId && deleteTarget && pendingNoteId === deleteTarget.id)}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirm}
+      />
     </section>
   );
 }

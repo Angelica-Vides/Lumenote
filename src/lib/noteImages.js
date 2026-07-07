@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { compressImageFile } from "./imageCompress";
 
 const BUCKET = "note-images";
 const MAX_BYTES = 2 * 1024 * 1024;
@@ -14,13 +15,18 @@ export async function uploadNoteImage(userId, file) {
     throw new Error("Images must be 2 MB or smaller.");
   }
 
-  const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const optimizedFile = await compressImageFile(file);
+  if (optimizedFile.size > MAX_BYTES) {
+    throw new Error("Images must be 2 MB or smaller after compression.");
+  }
+
+  const extension = optimizedFile.name.split(".").pop()?.toLowerCase() || "jpg";
   const path = `${userId}/${crypto.randomUUID()}.${extension}`;
 
-  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+  const { error } = await supabase.storage.from(BUCKET).upload(path, optimizedFile, {
     cacheControl: "3600",
     upsert: false,
-    contentType: file.type,
+    contentType: optimizedFile.type,
   });
 
   if (error) {

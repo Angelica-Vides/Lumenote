@@ -2,7 +2,7 @@
 
 Living design doc. Update this file and `mockup.html` as you iterate. Log changes in [DESIGN_LOG.md](./DESIGN_LOG.md).
 
-**Design status:** v0.4 — tabbed dashboard, sticky notes, rich-text editor, full note view page (see [PLAN.md §10](./PLAN.md#10-design-decisions-locked-v04))
+**Design status:** v0.5 — tabbed dashboard, sticky notes, rich-text editor, full note view page, search/sort, theme toggle, toasts & modals (see [PLAN.md §10](./PLAN.md#10-design-decisions-locked-v04))
 
 ---
 
@@ -11,7 +11,7 @@ Living design doc. Update this file and `mockup.html` as you iterate. Log change
 | Principle | Meaning for Lumenote |
 |-----------|----------------------|
 | **Focused** | Minimal chrome; content (notes) is the hero |
-| **Calm** | Dark, low-contrast UI for long study sessions |
+| **Calm** | Dark default, low-contrast UI for long study sessions; optional light theme |
 | **Cool light** | Teal accent = "lumen" — clarity and focus without harsh brightness |
 | **Private** | No social features; feels like a personal notebook |
 | **Personal** | Custom note colors let users organize their way |
@@ -38,6 +38,8 @@ Living design doc. Update this file and `mockup.html` as you iterate. Log change
 | `--accent-text` | `#042f2e` | Text on accent buttons |
 | `--danger` | `#ef4444` | Delete actions |
 | `--success` | `#22c55e` | Success messages |
+
+**Light theme** (`data-theme="light"`): inverted surfaces — `--bg` `#f4f6fa`, `--surface` `#ffffff`, `--text` `#1a2233`. Toggle in header; persisted in `localStorage`.
 
 ### Note colors (custom)
 
@@ -93,10 +95,11 @@ Tab bar: **My Notes | New Note**. Notes appear as a **sticky-note grid** (pinned
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  [Logo] Lumenote                         user@  Sign out   │
+│  [Logo] Lumenote              ☀ Light  user@  Sign out   │
 │  [ My Notes ]  [ New Note ]                                 │
 ├─────────────────────────────────────────────────────────────┤
-│  AI STUDY ASSISTANT  [ Summarize ] [ Suggest ]              │
+│  AI STUDY ASSISTANT  [ pick notes ] [ Summarize ] [ Suggest ]│
+│  [ Search notes…          ]  Sort [ Newest first ▼ ]        │
 │  PINNED (1)                                                 │
 │  📌┌──────────┐ ┌──────────┐                               │
 │    │ sticky   │ │ sticky   │   ← colored paper + tilt      │
@@ -150,18 +153,21 @@ Read-only full sticky note — same paper color as the card, wider layout for lo
 
 | Component | Used on | Notes |
 |-----------|---------|-------|
-| `Layout` | All pages | Header, logo → dashboard when logged in, footer |
+| `Layout` | All pages | Header, logo → dashboard when logged in, **theme toggle**, footer |
 | `NotesTabs` | Logged-in routes | My Notes \| New Note tab bar |
 | `Hero` | Landing | Teal accent on key word |
 | `AuthCard` | Login, Register | Centered form |
-| `NoteForm` | New / Edit note pages | Title, color, wraps RichTextEditor |
-| `RichTextEditor` | NoteForm | TipTap toolbar + character counter |
-| `NoteList` | Dashboard | Pinned + all notes sections |
-| `NoteCard` | Dashboard | Sticky-note style; pin badge when pinned; **View full note** link |
-| `NoteViewPage` | View note | Read-only full note; centered images; pin/edit/delete |
+| `NoteForm` | New / Edit note pages | Title, color, wraps RichTextEditor; **unsaved-changes guard** |
+| `RichTextEditor` | NoteForm | TipTap toolbar + character counter; **mobile “More formatting”** |
+| `NoteList` | Dashboard | Pinned + all notes sections; **empty search state** |
+| `NoteCard` | Dashboard | Sticky-note style; pin badge; **AI summary/ideas**, **Duplicate** |
+| `NoteViewPage` | View note | Read-only full note; compact **AiAssistant**; pin/edit/delete/duplicate |
 | `PinBadge` | NoteCard, NoteViewPage | Red pushpin when note is pinned |
 | `EmptyState` | Dashboard | SVG illustration + link to New Note |
-| `AiAssistant` | Dashboard | Summarize + suggest AI features |
+| `AiAssistant` | Dashboard, View page | Note picker, summarize + suggest, **Create note** from suggestion |
+| `ConfirmModal` | Dashboard, View, NoteForm | Delete confirm, leave-without-saving |
+| `ToastProvider` | App root | Save / pin / delete / duplicate feedback |
+| `ThemeProvider` | App root | Light/dark mode |
 | `ProtectedRoute` | Router | Redirect if anonymous |
 
 ---
@@ -174,9 +180,14 @@ Read-only full sticky note — same paper color as the card, wider layout for lo
 | **Custom color** | Pick swatch OR use color input → sticky-note paper color |
 | **View full note** | View full note on card → `/notes/:id` read-only page |
 | **Edit note** | Edit on card or view page → `/notes/:id/edit` |
-| **Delete note** | Delete → confirm dialog |
+| **Delete note** | Delete → **ConfirmModal** (not browser confirm) |
+| **Duplicate note** | Duplicate on card or view page → copy appears in grid |
+| **Search / sort** | Toolbar on My Notes filters title + body; sort by date or title |
 | **Pin note** | Pin button on card → pushpin badge; pinned section sorts first |
-| **Rich text** | TipTap toolbar; list style dropdowns; image upload to Storage |
+| **Rich text** | TipTap toolbar; list style dropdowns; **compressed** image upload to Storage |
+| **Unsaved edits** | “Unsaved changes” hint + modal if leaving editor |
+| **Save feedback** | Toast after save, pin, delete, duplicate |
+| **Theme** | Header toggle; preference in localStorage |
 | **Empty state** | Shown when `notes.length === 0` on My Notes tab |
 | **Auth (dev)** | Email confirmation **disabled** in Supabase |
 
@@ -202,6 +213,9 @@ Read-only full sticky note — same paper color as the card, wider layout for lo
 - [x] Empty state: illustration
 - [x] Full note view page (not inline card expand)
 - [x] Centered image frames on sticky notes
+- [x] Search/sort toolbar on My Notes
+- [x] Light/dark theme toggle
+- [x] Toasts, styled modals, unsaved-changes guard
 - [x] Email confirm: off for dev
 - [x] Final review of mockup in browser
 - [x] Sign-off → BUILD_STEPS Step 1

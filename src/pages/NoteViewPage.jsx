@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import AiAssistant from "../components/AiAssistant";
+import ConfirmModal from "../components/ConfirmModal";
 import PinBadge from "../components/PinBadge";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { isEmptyNoteBody, sanitizeNoteHtml } from "../lib/noteBody";
-import { deleteNote, fetchNote, updateNote } from "../lib/notes";
+import { deleteNote, duplicateNote, fetchNote, updateNote } from "../lib/notes";
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -18,10 +22,13 @@ function formatDate(iso) {
 export default function NoteViewPage() {
   const { noteId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const [note, setNote] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -50,6 +57,7 @@ export default function NoteViewPage() {
     try {
       const updated = await updateNote(note.id, { pinned: !note.pinned });
       setNote(updated);
+      showToast(updated.pinned ? "Note pinned." : "Note unpinned.");
     } catch (err) {
       setError(err.message || "Could not update note.");
     } finally {
@@ -57,15 +65,31 @@ export default function NoteViewPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!note || !window.confirm("Delete this note permanently?")) return;
+  const handleDuplicate = async () => {
+    if (!note || !user?.id) return;
+    setPending(true);
+    try {
+      const copy = await duplicateNote(user.id, note);
+      showToast(`Duplicated "${note.title}".`);
+      navigate(`/notes/${copy.id}/edit`);
+    } catch (err) {
+      setError(err.message || "Could not duplicate note.");
+    } finally {
+      setPending(false);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!note) return;
     setPending(true);
     try {
       await deleteNote(note.id);
+      showToast(`Deleted "${note.title}".`);
       navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(err.message || "Could not delete note.");
       setPending(false);
+      setDeleteOpen(false);
     }
   };
 
@@ -116,13 +140,21 @@ export default function NoteViewPage() {
           >
             {note.pinned ? "Unpin" : "Pin"}
           </button>
+          <button
+            type="button"
+            className="btn btn--ghost btn--sm"
+            onClick={handleDuplicate}
+            disabled={pending}
+          >
+            Duplicate
+          </button>
           <Link to={`/notes/${note.id}/edit`} className="btn btn--ghost btn--sm">
             Edit
           </Link>
           <button
             type="button"
             className="btn btn--danger btn--sm"
-            onClick={handleDelete}
+            onClick={() => setDeleteOpen(true)}
             disabled={pending}
           >
             Delete
@@ -153,6 +185,19 @@ export default function NoteViewPage() {
           <Link to={`/notes/${note.id}/edit`}>Edit this note</Link> to add content.
         </p>
       )}
+
+      <AiAssistant notes={[note]} compact onNoteCreated={() => showToast("Suggestion saved as a new note.")} />
+
+      <ConfirmModal
+        open={deleteOpen}
+        title="Delete note?"
+        message={`Delete "${note.title}" permanently? This cannot be undone.`}
+        confirmLabel="Delete note"
+        danger
+        busy={pending}
+        onCancel={() => setDeleteOpen(false)}
+        onConfirm={handleDeleteConfirm}
+      />
     </section>
   );
 }

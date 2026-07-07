@@ -52,15 +52,20 @@ flowchart TD
     B -- Yes --> F
     F --> G[Open My Notes tab]
     G --> H[New Note tab — create note]
-    G --> I[Edit / pin note]
-    G --> J[Delete note]
+    G --> I[Edit / pin / duplicate note]
+    G --> J[Delete note — confirm modal]
     G --> M[View full note]
-    G --> L[Run AI summary or suggestions]
-    M --> G
+    G --> N[Search or sort notes]
+    G --> L[Select notes → AI summary or suggestions]
+    G --> O[Create note from AI suggestion]
+    M --> L
     H --> G
     I --> G
     J --> G
     L --> G
+    N --> G
+    O --> G
+    M --> G
     F --> K[Sign out]
     K --> C
 ```
@@ -82,10 +87,12 @@ flowchart TD
     EDIT --> VAL2[Validate changes]
     VAL2 --> UPD[UPDATE note by id]
     UPD --> BACK
-    ACTION -->|Delete| CONF{Confirm?}
+    ACTION -->|Delete| CONF{ConfirmModal?}
     CONF -- No --> START
     CONF -- Yes --> DEL[DELETE note by id]
     DEL --> REFRESH
+    ACTION -->|Duplicate| DUP[INSERT copy of note]
+    DUP --> REFRESH
     REFRESH --> START
     ERR --> START
 ```
@@ -112,11 +119,13 @@ flowchart TD
 flowchart TD
     START([User clicks Summarize notes]) --> AUTH{Authenticated?}
     AUTH -- No --> E401[401 — log in again]
-    AUTH -- Yes --> NOTES{Has notes?}
+    AUTH -- Yes --> PICK{Notes selected?}
+    PICK -- No --> E400B[Select at least one note]
+    PICK -- Yes --> NOTES{Has notes?}
     NOTES -- No --> E400[Create a note first]
     NOTES -- Yes --> RATE{Under hourly limit?}
     RATE -- No --> E429[429 — try later]
-    RATE -- Yes --> LOAD[Load up to 25 notes via RLS]
+    RATE -- Yes --> LOAD[Load selected notes via RLS + noteIds]
     LOAD --> LOG[Insert ai_requests row]
     LOG --> PROMPT[Build summarize prompt + JSON schema]
     PROMPT --> LLM{Call OpenAI<br/>gpt-4o-mini}
@@ -136,13 +145,18 @@ flowchart TD
 flowchart TD
     START([User clicks Suggest study notes]) --> AUTH{Authenticated?}
     AUTH -- No --> E401[401]
-    AUTH -- Yes --> RATE{Under hourly limit?}
+    AUTH -- Yes --> PICK{Notes selected?}
+    PICK -- No --> E400B[Select at least one note]
+    PICK -- Yes --> RATE{Under hourly limit?}
     RATE -- No --> E429[429]
-    RATE -- Yes --> LOAD[Load user notes]
+    RATE -- Yes --> LOAD[Load selected user notes]
     LOAD --> PROMPT[Build suggest prompt + JSON schema]
     PROMPT --> LLM[OpenAI gpt-4o-mini]
     LLM -- OK --> OUT[suggestions: title, rationale, starterText]
-    OUT --> DONE([Render suggestion list])
+    OUT --> CREATE{Create note?}
+    CREATE -- Yes --> NEW[INSERT new note from suggestion]
+    CREATE -- No --> DONE([Render suggestion list])
+    NEW --> DONE
     LLM -- Fail --> ERR[Friendly inline error]
 ```
 
@@ -173,7 +187,8 @@ stateDiagram-v2
     ViewNote --> MyNotes: Back to My Notes
     ViewNote --> EditNote: Edit button
     EditNote --> MyNotes: save or cancel
-    MyNotes --> MyNotes: pin / delete / AI assistant
+    MyNotes --> MyNotes: pin / delete / duplicate / search / AI assistant
+    ViewNote --> ViewNote: AI panel / duplicate / delete modal
     Anonymous --> MyNotes: redirect from / when logged in
 ```
 
@@ -390,9 +405,11 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    APP[App] --> AUTHP[AuthProvider]
+    APP[App] --> THEMEP[ThemeProvider]
+    THEMEP --> TOASTP[ToastProvider]
+    TOASTP --> AUTHP[AuthProvider]
     AUTHP --> RT[BrowserRouter]
-    RT --> LAYOUT[Layout + NotesTabs]
+    RT --> LAYOUT[Layout + NotesTabs + theme toggle]
     LAYOUT --> NAV[Header / Logo / Sign out]
     RT --> ROUTES[Routes]
 
@@ -401,22 +418,26 @@ flowchart TD
     ROUTES --> REGISTER[Register]
     ROUTES --> PROTECT[ProtectedRoute]
     PROTECT --> DASH[Dashboard — My Notes tab]
-    PROTECT --> NEW[NoteEditorPage /notes/new]
-    PROTECT --> EDIT[NoteEditorPage /notes/:id/edit]
+    PROTECT --> NEW[NoteEditorPage /notes/new — lazy]
+    PROTECT --> EDIT[NoteEditorPage /notes/:id/edit — lazy]
     PROTECT --> VIEWPAGE[NoteViewPage /notes/:id]
 
-    DASH --> AI[AiAssistant]
+    DASH --> TOOLBAR[Search + sort toolbar]
+    DASH --> AI[AiAssistant + note picker]
     DASH --> LIST[NoteList]
-    LIST --> CARD[NoteCard sticky notes]
+    LIST --> CARD[NoteCard — AI shortcuts, duplicate]
     LIST --> EMPTY[EmptyState illustration]
     CARD --> VIEW[View full note link]
     VIEW --> VIEWPAGE
-    VIEWPAGE --> PIN[PinBadge]
-    NEW --> FORM[NoteForm + RichTextEditor]
+    VIEWPAGE --> AIVIEW[AiAssistant compact]
+    VIEWPAGE --> MODAL[ConfirmModal delete]
+    NEW --> FORM[NoteForm + lazy RichTextEditor]
     EDIT --> FORM
-    FORM --> STOR[lib/noteImages.js → Storage]
+    FORM --> LEAVE[ConfirmModal leave without saving]
+    FORM --> STOR[lib/noteImages.js → compress → Storage]
     AI --> AILIB[lib/ai.js]
     AILIB --> FN[Supabase Edge Function]
+    DASH --> TOAST[Toast feedback]
 ```
 
 ---

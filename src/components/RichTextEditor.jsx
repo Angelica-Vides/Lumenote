@@ -115,6 +115,7 @@ function ListStyleDropdown({ label, options, currentValue, isActive, onSelect })
 export default function RichTextEditor({ value, onChange, userId, onError }) {
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
+  const [showMoreTools, setShowMoreTools] = useState(false);
   const [charCount, setCharCount] = useState(() => stripHtml(value || "").length);
 
   const editor = useEditor({
@@ -260,67 +261,78 @@ export default function RichTextEditor({ value, onChange, userId, onError }) {
           <span className="rte-toolbar__underline">U</span>
         </ToolbarButton>
 
-        <span className="rte-toolbar__divider" aria-hidden="true" />
+        <span className="rte-toolbar__divider rte-toolbar__divider--mobile" aria-hidden="true" />
 
-        <ToolbarButton
-          title="Subtitle (heading 2)"
-          active={editor.isActive("heading", { level: 2 })}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        >
-          H2
-        </ToolbarButton>
-        <ToolbarButton
-          title="Small heading (heading 3)"
-          active={editor.isActive("heading", { level: 3 })}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        >
-          H3
-        </ToolbarButton>
-
-        <span className="rte-toolbar__divider" aria-hidden="true" />
-
-        <ListStyleDropdown
-          label="Bullet list style"
-          options={BULLET_STYLE_OPTIONS}
-          currentValue={currentBulletStyle}
-          isActive={editor.isActive("bulletList")}
-          onSelect={handleBulletStyle}
-        />
-
-        <ListStyleDropdown
-          label="Numbered list style"
-          options={ORDERED_STYLE_OPTIONS}
-          currentValue={currentOrderedStyle}
-          isActive={editor.isActive("orderedList")}
-          onSelect={handleOrderedStyle}
-        />
-
-        <label className="rte-toolbar__select-wrap">
-          <span className="visually-hidden">Font</span>
-          <select
-            className="rte-toolbar__select"
-            defaultValue=""
-            onChange={(e) => setFont(e.target.value)}
-            aria-label="Font family"
+        <div className={`rte-toolbar__more${showMoreTools ? " rte-toolbar__more--open" : ""}`}>
+          <ToolbarButton
+            title="Subtitle (heading 2)"
+            active={editor.isActive("heading", { level: 2 })}
+            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           >
-            {FONT_OPTIONS.map((option) => (
-              <option key={option.label} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            H2
+          </ToolbarButton>
+          <ToolbarButton
+            title="Small heading (heading 3)"
+            active={editor.isActive("heading", { level: 3 })}
+            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+          >
+            H3
+          </ToolbarButton>
 
-        <span className="rte-toolbar__divider" aria-hidden="true" />
+          <span className="rte-toolbar__divider" aria-hidden="true" />
+
+          <ListStyleDropdown
+            label="Bullet list style"
+            options={BULLET_STYLE_OPTIONS}
+            currentValue={currentBulletStyle}
+            isActive={editor.isActive("bulletList")}
+            onSelect={handleBulletStyle}
+          />
+
+          <ListStyleDropdown
+            label="Numbered list style"
+            options={ORDERED_STYLE_OPTIONS}
+            currentValue={currentOrderedStyle}
+            isActive={editor.isActive("orderedList")}
+            onSelect={handleOrderedStyle}
+          />
+
+          <label className="rte-toolbar__select-wrap">
+            <span className="visually-hidden">Font</span>
+            <select
+              className="rte-toolbar__select"
+              defaultValue=""
+              onChange={(e) => setFont(e.target.value)}
+              aria-label="Font family"
+            >
+              {FONT_OPTIONS.map((option) => (
+                <option key={option.label} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <span className="rte-toolbar__divider" aria-hidden="true" />
+
+          <button
+            type="button"
+            className="rte-toolbar__btn rte-toolbar__btn--image"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            title="Upload image"
+          >
+            {uploading ? "Uploading…" : "📷 Add image"}
+          </button>
+        </div>
 
         <button
           type="button"
-          className="rte-toolbar__btn rte-toolbar__btn--image"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-          title="Upload image"
+          className="rte-toolbar__more-toggle btn btn--ghost btn--sm"
+          onClick={() => setShowMoreTools((open) => !open)}
+          aria-expanded={showMoreTools}
         >
-          {uploading ? "Uploading…" : "📷 Add image"}
+          {showMoreTools ? "Less formatting" : "More formatting"}
         </button>
         <input
           ref={fileInputRef}

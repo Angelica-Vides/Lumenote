@@ -20,7 +20,15 @@ function shouldOfferFullView(body = "") {
   return notePreviewText(body).endsWith("…");
 }
 
-export default function NoteCard({ note, onEdit, onDelete, onTogglePin, disabled = false }) {
+export default function NoteCard({
+  note,
+  onEdit,
+  onDelete,
+  onTogglePin,
+  onDuplicate,
+  onRunAi,
+  disabled = false,
+}) {
   const navigate = useNavigate();
   const rich = hasRichContent(note.body);
   const plainPreview = notePreviewText(note.body);
@@ -54,40 +62,70 @@ export default function NoteCard({ note, onEdit, onDelete, onTogglePin, disabled
       )}
 
       <p className="note-card__meta">Updated {formatDate(note.updated_at)}</p>
-      {(onEdit || onDelete || onTogglePin) && (
-        <div className="note-card__actions">
-          {onTogglePin && (
+      <div className="note-card__actions">
+        {onRunAi && (
+          <>
             <button
               type="button"
               className="btn btn--ghost btn--sm"
-              onClick={() => onTogglePin(note)}
+              onClick={() => onRunAi(note, "summarize")}
               disabled={disabled}
+              title="Summarize this note with AI"
             >
-              {disabled ? "…" : note.pinned ? "Unpin" : "Pin"}
+              AI summary
             </button>
-          )}
-          {onEdit && (
             <button
               type="button"
               className="btn btn--ghost btn--sm"
-              onClick={() => onEdit(note)}
+              onClick={() => onRunAi(note, "suggest")}
               disabled={disabled}
+              title="Suggest study notes from this note"
             >
-              Edit
+              AI ideas
             </button>
-          )}
-          {onDelete && (
-            <button
-              type="button"
-              className="btn btn--danger btn--sm"
-              onClick={() => onDelete(note.id)}
-              disabled={disabled}
-            >
-              {disabled ? "…" : "Delete"}
-            </button>
-          )}
-        </div>
-      )}
+          </>
+        )}
+        {onTogglePin && (
+          <button
+            type="button"
+            className="btn btn--ghost btn--sm"
+            onClick={() => onTogglePin(note)}
+            disabled={disabled}
+          >
+            {disabled ? "…" : note.pinned ? "Unpin" : "Pin"}
+          </button>
+        )}
+        {onDuplicate && (
+          <button
+            type="button"
+            className="btn btn--ghost btn--sm"
+            onClick={() => onDuplicate(note)}
+            disabled={disabled}
+          >
+            Duplicate
+          </button>
+        )}
+        {onEdit && (
+          <button
+            type="button"
+            className="btn btn--ghost btn--sm"
+            onClick={() => onEdit(note)}
+            disabled={disabled}
+          >
+            Edit
+          </button>
+        )}
+        {onDelete && (
+          <button
+            type="button"
+            className="btn btn--danger btn--sm"
+            onClick={() => onDelete(note.id)}
+            disabled={disabled}
+          >
+            Delete
+          </button>
+        )}
+      </div>
     </article>
   );
 }

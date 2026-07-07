@@ -1,9 +1,27 @@
 import NoteCard from "./NoteCard";
 import EmptyState from "./EmptyState";
 
-export default function NoteList({ notes, onEdit, onDelete, onTogglePin, pendingNoteId }) {
-  if (notes.length === 0) {
+export default function NoteList({
+  notes,
+  totalCount = 0,
+  searchQuery = "",
+  onEdit,
+  onDelete,
+  onTogglePin,
+  onDuplicate,
+  onRunAi,
+  pendingNoteId,
+}) {
+  if (totalCount === 0) {
     return <EmptyState />;
+  }
+
+  if (notes.length === 0) {
+    return (
+      <div className="note-list note-list--empty-search notes-board">
+        <p className="muted">No notes match “{searchQuery}”. Try a different search.</p>
+      </div>
+    );
   }
 
   const pinned = notes.filter((n) => n.pinned);
@@ -14,6 +32,8 @@ export default function NoteList({ notes, onEdit, onDelete, onTogglePin, pending
     onEdit,
     onDelete,
     onTogglePin,
+    onDuplicate,
+    onRunAi,
     disabled: pendingNoteId === note.id,
   });
 

@@ -103,3 +103,11 @@ export async function deleteNote(noteId) {
   const { error } = await supabase.from("notes").delete().eq("id", noteId);
   if (error) throw new Error(mapDbError(error));
 }
+
+export async function duplicateNote(userId, note) {
+  return createNote(userId, {
+    title: `${note.title} (copy)`,
+    body: note.body ?? "",
+    color: note.color,
+  });
+}

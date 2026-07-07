@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import NoteForm from "../components/NoteForm";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { createNote, fetchNote, updateNote } from "../lib/notes";
 
 export default function NoteEditorPage({ mode = "edit" }) {
@@ -9,6 +10,7 @@ export default function NoteEditorPage({ mode = "edit" }) {
   const isNew = mode === "new";
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [note, setNote] = useState(null);
   const [loading, setLoading] = useState(!isNew);
   const [error, setError] = useState("");
@@ -40,6 +42,7 @@ export default function NoteEditorPage({ mode = "edit" }) {
 
   const handleCreate = async (form) => {
     await createNote(user.id, form);
+    showToast("Note saved.");
     navigate("/dashboard", { replace: true });
   };
 
@@ -49,6 +52,7 @@ export default function NoteEditorPage({ mode = "edit" }) {
       body: form.body,
       color: form.color,
     });
+    showToast("Changes saved.");
     navigate("/dashboard", { replace: true });
   };
 

@@ -1,10 +1,12 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import LogoMark from "./LogoMark";
 import NotesTabs from "./NotesTabs";
 
 export default function Layout({ children }) {
   const { user, loading, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const showNotesTabs =
@@ -31,6 +33,15 @@ export default function Layout({ children }) {
             <span>Lumenote</span>
           </Link>
           <nav className="nav">
+            <button
+              type="button"
+              className="btn btn--ghost btn--sm theme-toggle"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              title={theme === "dark" ? "Light mode" : "Dark mode"}
+            >
+              {theme === "dark" ? "☀ Light" : "☾ Dark"}
+            </button>
             {user && (
               <>
                 <span className="nav__email">{user.email}</span>

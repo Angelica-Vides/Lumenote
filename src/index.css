@@ -1851,3 +1851,236 @@ a:hover {
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+/* ——— UX polish: search, toasts, modals, theme, mobile RTE ——— */
+
+.notes-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1rem;
+}
+
+.notes-toolbar__search {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.notes-toolbar__search input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-hover);
+  color: var(--text);
+  font: inherit;
+}
+
+.notes-toolbar__search input:focus {
+  outline: 2px solid var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.notes-toolbar__sort {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.notes-toolbar__sort select {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-hover);
+  color: var(--text);
+  font: inherit;
+}
+
+.note-list--empty-search {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  z-index: 1000;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  background: rgba(21, 25, 34, 0.95);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  font-size: 0.9rem;
+  animation: toast-in 0.25s ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  width: min(420px, 100%);
+  padding: 1.5rem;
+  animation: modal-in 0.2s ease-out;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal__title {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+}
+
+.modal__message {
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+  line-height: 1.55;
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.note-form__dirty-hint {
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #fbbf24;
+}
+
+.ai-result__suggestion {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ai-result__suggestion > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-result__suggestion .btn {
+  flex-shrink: 0;
+}
+
+.theme-toggle {
+  min-width: 5.5rem;
+}
+
+.rte-toolbar__divider--mobile {
+  display: none;
+}
+
+.rte-toolbar__more-toggle {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .rte-toolbar {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .rte-toolbar__divider--mobile {
+    display: block;
+    width: 100%;
+    height: 0;
+    margin: 0.15rem 0;
+  }
+
+  .rte-toolbar__more {
+    display: none;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .rte-toolbar__more--open {
+    display: flex;
+  }
+
+  .rte-toolbar__more-toggle {
+    display: inline-flex;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.25rem;
+  }
+}
+
+[data-theme="light"] {
+  --bg: #f4f6fa;
+  --bg-glow: #e8f4f2;
+  --surface: #ffffff;
+  --surface-hover: #eef1f6;
+  --border: #d5dbe6;
+  --text: #1a2233;
+  --muted: #5c677a;
+  --shadow: 0 4px 24px rgba(15, 23, 42, 0.12);
+}
+
+[data-theme="light"] body {
+  background: radial-gradient(ellipse at top, var(--bg-glow) 0%, var(--bg) 55%);
+}
+
+[data-theme="light"] .header {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="light"] .toast {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(20, 184, 166, 0.35);
+}
+
+[data-theme="light"] .note-card.card {
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+[data-theme="light"] .note-card__body--rich::after {
+  background: linear-gradient(to bottom, transparent, var(--note-color, #fff));
+}
+
+[data-theme="light"] .modal-backdrop {
+  background: rgba(15, 23, 42, 0.35);
+}
