@@ -850,6 +850,10 @@ a:hover {
 
 .note-card__body--rich {
   position: relative;
+  display: grid;
+  justify-items: stretch;
+  width: 100%;
+  min-width: 0;
   max-height: 5.5rem;
   overflow: hidden;
   color: var(--note-ink);
@@ -860,6 +864,7 @@ a:hover {
   position: absolute;
   inset: auto 0 0;
   height: 1.75rem;
+  z-index: 1;
   background: linear-gradient(
     transparent,
     color-mix(in srgb, var(--note-color, #2dd4bf) 82%, #ffffff 18%)
@@ -974,6 +979,12 @@ a:hover {
   margin: 0.85rem 0 0.4rem;
 }
 
+.note-body-render {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
 .note-body-render p {
   margin: 0.5rem 0;
 }
@@ -985,15 +996,31 @@ a:hover {
 
 .note-image-taped {
   position: relative;
+  z-index: 2;
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin-inline: auto;
+  margin-block: 0.5rem;
+  align-self: center;
+  justify-self: center;
+}
+
+.note-image-mat {
+  position: relative;
   display: block;
   width: fit-content;
   max-width: 100%;
   margin-inline: auto;
-  margin-block: 0.5rem;
+  padding: 0.35rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(30, 41, 59, 0.16);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
 }
 
-.note-image-taped::before,
-.note-image-taped::after {
+.note-image-mat::before,
+.note-image-mat::after {
   content: "";
   position: absolute;
   width: 2.85rem;
@@ -1015,15 +1042,33 @@ a:hover {
   backdrop-filter: blur(2px);
 }
 
-.note-image-taped::before {
+.note-image-mat::before {
   top: -0.38rem;
   left: -0.55rem;
   transform: rotate(-34deg);
 }
 
-.note-image-taped::after {
+.note-image-mat::after {
   bottom: -0.38rem;
   right: -0.55rem;
+  transform: rotate(-34deg);
+}
+
+.note-card__body--rich .note-image-mat::before,
+.note-card__body--rich .note-image-mat::after {
+  width: 2rem;
+  height: 0.68rem;
+}
+
+.note-card__body--rich .note-image-mat::before {
+  top: 0.15rem;
+  left: 0.15rem;
+  transform: rotate(-34deg);
+}
+
+.note-card__body--rich .note-image-mat::after {
+  bottom: 0.15rem;
+  right: 0.15rem;
   transform: rotate(-34deg);
 }
 
@@ -1032,22 +1077,89 @@ a:hover {
   text-align: center;
 }
 
-.note-body-render img {
+.note-body-render img,
+.note-card__body--rich img {
   display: block;
-  max-width: min(100%, 640px);
   width: auto;
+  max-width: 100%;
   height: auto;
   margin: 0;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.94);
-  padding: 0.5rem;
-  border: 1px solid rgba(30, 41, 59, 0.14);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  box-shadow: none;
   object-fit: contain;
 }
 
+.note-body-render .note-image-mat {
+  padding: 0.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(30, 41, 59, 0.14);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+}
+
+.note-body-render img {
+  max-width: min(100%, 640px);
+  border-radius: 8px;
+}
+
+.note-card__body--rich .note-image-taped {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin-block: 0.35rem;
+  margin-inline: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.note-card__body--rich .note-image-mat {
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  margin-inline: 0;
+  flex: 0 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.note-card__body--rich .note-image-mat img {
+  min-width: 0;
+  width: auto;
+  max-width: 100%;
+  max-height: 150px;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+}
+
 .note-body-render .note-image-taped {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
   margin-block: 1.25rem;
+}
+
+.note-body-render .note-image-mat {
+  min-width: 0;
+  max-width: min(100%, 640px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.note-body-render .note-image-mat img {
+  min-width: 0;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
 }
 
 .note-body-render ul,
@@ -1074,25 +1186,6 @@ a:hover {
 
 .note-card__body--rich:has(img) {
   max-height: 9rem;
-}
-
-.note-card__body--rich img {
-  display: block;
-  max-width: calc(100% - 0.25rem);
-  width: auto;
-  max-height: 150px;
-  height: auto;
-  margin: 0;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.94);
-  padding: 0.35rem;
-  border: 1px solid rgba(30, 41, 59, 0.16);
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
-  object-fit: contain;
-}
-
-.note-card__body--rich .note-image-taped {
-  margin-block: 0.5rem;
 }
 
 .note-card__expand {
