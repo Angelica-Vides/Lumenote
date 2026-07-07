@@ -136,9 +136,21 @@ Deno.serve(async (request) => {
       return jsonResponse({ error: "Please log in before using AI features." }, 401);
     }
 
-    const { action } = await request.json();
+    const { action, noteIds } = await request.json();
     if (action !== AI_ACTIONS.summarize && action !== AI_ACTIONS.suggest) {
       return jsonResponse({ error: "Unsupported AI action." }, 400);
+    }
+
+    if (noteIds !== undefined && !Array.isArray(noteIds)) {
+      return jsonResponse({ error: "Invalid note selection." }, 400);
+    }
+
+    if (Array.isArray(noteIds) && noteIds.length === 0) {
+      return jsonResponse({ error: "Select at least one note for AI analysis." }, 400);
+    }
+
+    if (Array.isArray(noteIds) && noteIds.some((id) => typeof id !== "string" || !id.trim())) {
+      return jsonResponse({ error: "Invalid note selection." }, 400);
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -184,19 +196,28 @@ Deno.serve(async (request) => {
       );
     }
 
-    const { data: notes, error: notesError } = await supabase
+    let notesQuery = supabase
       .from("notes")
-      .select("title, body, pinned, updated_at")
+      .select("id, title, body, pinned, updated_at")
       .order("pinned", { ascending: false })
       .order("updated_at", { ascending: false })
       .limit(25);
+
+    if (Array.isArray(noteIds) && noteIds.length > 0) {
+      notesQuery = notesQuery.in("id", noteIds);
+    }
+
+    const { data: notes, error: notesError } = await notesQuery;
 
     if (notesError) {
       return jsonResponse({ error: "Could not load your notes for AI analysis." }, 500);
     }
 
     if (!notes || notes.length === 0) {
-      return jsonResponse({ error: "Create at least one note before using AI assistance." }, 400);
+      return jsonResponse(
+        { error: "No matching notes were found. Check your selection and try again." },
+        400,
+      );
     }
 
     const { error: insertError } = await supabase.from("ai_requests").insert({
@@ -218,6 +239,7 @@ Deno.serve(async (request) => {
       model: aiResult.model,
       result: aiResult.data,
       notesAnalyzed: notes.length,
+      noteTitles: notes.map((note) => note.title),
     });
   } catch (_error) {
     return jsonResponse({ error: "Unexpected AI error. Please try again." }, 500);

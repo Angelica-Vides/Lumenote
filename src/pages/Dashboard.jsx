@@ -83,7 +83,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <AiAssistant noteCount={notes.length} />
+      <AiAssistant notes={notes} />
 
       {error && (
         <div className="dashboard__error">

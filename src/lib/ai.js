@@ -15,9 +15,9 @@ async function readFunctionError(error) {
   return error.message;
 }
 
-export async function runNoteAi(action) {
+export async function runNoteAi(action, noteIds = []) {
   const { data, error } = await supabase.functions.invoke("ai-notes", {
-    body: { action },
+    body: { action, noteIds },
   });
 
   if (error) {
